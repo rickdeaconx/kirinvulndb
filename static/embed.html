@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knostic AI - Kirin Vulnerability Dashboard - Embeddable Widget</title>
+    <style>
+        /* Embeddable Dashboard CSS - Optimized for iframes 
+           Copyright © 2025 Rick Deacon, Knostic AI - https://knostic.ai
+           All Rights Reserved */
+        :root {
+            --primary: #0066cc;
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #28a745;
+            --bg: #ffffff;
+            --surface: #f8f9fa;
+            --text: #333333;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        /* Dark theme */
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --surface: #2d2d2d;
+            --text: #ffffff;
+            --text-muted: #adb5bd;
+            --border: #404040;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 12px;
+        }
+
+        .embed-container {
+            max-width: 100%;
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .embed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .embed-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .embed-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .stat-critical .stat-value { color: var(--critical); }
+        .stat-high .stat-value { color: var(--high); }
+        .stat-medium .stat-value { color: var(--medium); }
+        .stat-low .stat-value { color: var(--low); }
+
+        .vuln-list {
+            margin-bottom: 16px;
+        }
+
+        .vuln-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .vuln-item:hover {
+            box-shadow: 0 2px 8px var(--shadow);
+            transform: translateY(-1px);
+        }
+
+        .severity-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .severity-critical { background: var(--critical); }
+        .severity-high { background: var(--high); }
+        .severity-medium { background: var(--medium); }
+        .severity-low { background: var(--low); }
+
+        .vuln-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .vuln-id {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .vuln-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .vuln-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+        }
+
+        .error {
+            background: #fee;
+            color: #c41e3a;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .embed-footer {
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .embed-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .embed-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .vuln-meta {
+                flex-direction: column;
+                gap: 4px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="embed-container">
+        <div class="embed-header">
+            <div class="embed-title">
+                🛡️ AI Security Monitor
+                <span class="embed-badge">LIVE</span>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="vuln-list" id="vuln-list">
+            <div class="loading">Loading vulnerabilities...</div>
+        </div>
+
+        <div class="embed-footer">
+            Powered by <a href="https://knostic.ai" target="_blank">Knostic AI - Kirin VulnDB</a>
+        </div>
+    </div>
+
+    <script>
+        // Embeddable Dashboard JavaScript
+        class EmbeddableDashboard {
+            constructor() {
+                this.apiBase = 'http://localhost:8080/api';
+                this.apiKey = this.getApiKey();
+                this.theme = this.getTheme();
+                this.limit = this.getLimit();
+                this.init();
+            }
+
+            getApiKey() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('api_key') || 'wp-demo-key';
+            }
+
+            getTheme() {
+                const params = new URLSearchParams(window.location.search);
+                const theme = params.get('theme') || 'light';
+                if (theme === 'dark') {
+                    document.body.setAttribute('data-theme', 'dark');
+                }
+                return theme;
+            }
+
+            getLimit() {
+                const params = new URLSearchParams(window.location.search);
+                return parseInt(params.get('limit')) || 5;
+            }
+
+            async init() {
+                try {
+                    await Promise.all([
+                        this.loadStats(),
+                        this.loadVulnerabilities()
+                    ]);
+                } catch (error) {
+                    console.error('Failed to initialize dashboard:', error);
+                    this.showError('Failed to load vulnerability data');
+                }
+            }
+
+            async makeApiRequest(endpoint) {
+                const response = await fetch(`${this.apiBase}${endpoint}`, {
+                    headers: {
+                        'X-API-Key': this.apiKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                return await response.json();
+            }
+
+            async loadStats() {
+                try {
+                    const data = await this.makeApiRequest('/wordpress/embed/stats');
+                    this.renderStats(data.stats);
+                } catch (error) {
+                    console.error('Failed to load stats:', error);
+                }
+            }
+
+            async loadVulnerabilities() {
+                try {
+                    const data = await this.makeApiRequest(`/wordpress/embed/vulnerabilities?limit=${this.limit}&format=json`);
+                    this.renderVulnerabilities(data.vulnerabilities);
+                } catch (error) {
+                    console.error('Failed to load vulnerabilities:', error);
+                    this.showError('Failed to load vulnerabilities');
+                }
+            }
+
+            renderStats(stats) {
+                const statsGrid = document.getElementById('stats-grid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card stat-critical">
+                        <div class="stat-value">${stats.critical_vulnerabilities}</div>
+                        <div class="stat-label">Critical</div>
+                    </div>
+                    <div class="stat-card stat-high">
+                        <div class="stat-value">${stats.high_vulnerabilities}</div>
+                        <div class="stat-label">High</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total_vulnerabilities}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.recent_vulnerabilities}</div>
+                        <div class="stat-label">Recent</div>
+                    </div>
+                `;
+            }
+
+            renderVulnerabilities(vulnerabilities) {
+                const vulnList = document.getElementById('vuln-list');
+                
+                if (!vulnerabilities || vulnerabilities.length === 0) {
+                    vulnList.innerHTML = '<div class="loading">No vulnerabilities found</div>';
+                    return;
+                }
+
+                const vulnItems = vulnerabilities.map(vuln => `
+                    <div class="vuln-item">
+                        <div class="severity-dot severity-${vuln.severity.toLowerCase()}"></div>
+                        <div class="vuln-content">
+                            <div class="vuln-id">${vuln.cve_id || vuln.vulnerability_id || 'N/A'}</div>
+                            <div class="vuln-title">${this.escapeHtml(vuln.title)}</div>
+                            <div class="vuln-meta">
+                                <span>CVSS: ${vuln.cvss_score || 'N/A'}</span>
+                                <span>Status: ${vuln.patch_status.replace('_', ' ')}</span>
+                                <span>${new Date(vuln.created_at).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                vulnList.innerHTML = vulnItems;
+            }
+
+            showError(message) {
+                const vulnList = document.getElementById('vuln-list');
+                vulnList.innerHTML = `<div class="error">${message}</div>`;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new EmbeddableDashboard();
+        });
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            new EmbeddableDashboard();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

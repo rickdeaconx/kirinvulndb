@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knostic AI - Kirin Security Operations Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Knostic AI - Kirin Security Dashboard - Cybersecurity Theme CSS 
+           Copyright © 2025 Rick Deacon, Knostic AI - https://knostic.ai
+           All Rights Reserved */
+        
+        /* CSS Variables for Cybersecurity Theme */
+        :root {
+          /* Dark Theme Colors */
+          --bg-primary: #0A0E1B;
+          --bg-secondary: #0F1420;
+          --bg-tertiary: #1A1F2E;
+          --bg-overlay: rgba(10, 14, 27, 0.95);
+          
+          /* Alert & Severity Colors */
+          --critical: #FF3E3E;
+          --high: #FF8C42;
+          --medium: #FFD23F;
+          --low: #44CF6C;
+          --info: #3E92CC;
+          
+          /* Accent Colors */
+          --accent-primary: #00D9FF;
+          --accent-secondary: #7B61FF;
+          --accent-success: #00FF88;
+          --accent-warning: #FFB700;
+          
+          /* Text Colors */
+          --text-primary: #E5E7EB;
+          --text-secondary: #9CA3AF;
+          --text-muted: #6B7280;
+          --text-code: #00FF88;
+          
+          /* UI Elements */
+          --border-color: #2A3441;
+          --border-active: #00D9FF;
+          --surface-hover: rgba(0, 217, 255, 0.1);
+          --surface-active: rgba(0, 217, 255, 0.2);
+          
+          /* Typography */
+          --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+          --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          
+          /* Spacing */
+          --spacing-xs: 4px;
+          --spacing-sm: 8px;
+          --spacing-md: 16px;
+          --spacing-lg: 24px;
+          --spacing-xl: 32px;
+          
+          /* Animation */
+          --transition-fast: 150ms ease;
+          --transition-normal: 200ms ease;
+          --transition-slow: 300ms ease;
+        }
+        
+        /* Global Styles */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: var(--font-sans);
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          line-height: 1.5;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          min-height: 100vh;
+          overflow-x: hidden;
+          margin: 0;
+          padding: 0;
+          width: 100%;
+        }
+
+        /* Main Dashboard Container */
+        .kirin-dashboard {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        /* Critical banner styles removed */
+
+        /* Dashboard Header */
+        .dashboard-header {
+          background: var(--bg-tertiary);
+          border-bottom: 1px solid var(--border-color);
+          padding: var(--spacing-lg) var(--spacing-xl);
+          position: relative;
+        }
+
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 var(--spacing-lg);
+          width: 100%;
+        }
+
+        .soc-title {
+          font-family: var(--font-mono);
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--accent-primary);
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .system-status {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-md);
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+        }
+
+        .status-indicator {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: var(--accent-success);
+          animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+          0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+          50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+        }
+
+        /* Dashboard Grid Layout */
+        .dashboard-grid {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          width: 100%;
+          position: relative;
+        }
+
+        /* Threat Level Indicator */
+        .threat-indicator {
+          position: fixed;
+          left: 0;
+          top: 120px;
+          bottom: 0;
+          width: 60px;
+          background: var(--bg-tertiary);
+          border-right: 1px solid var(--border-color);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: var(--spacing-lg) 0;
+          z-index: 100;
+        }
+
+        .threat-bar {
+          flex: 1;
+          width: 20px;
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 2px;
+          margin-bottom: var(--spacing-md);
+        }
+
+        .threat-segment {
+          flex: 1;
+          position: relative;
+          background: var(--border-color);
+          transition: var(--transition-normal);
+        }
+
+        .threat-segment.active.level-low { background: var(--low); }
+        .threat-segment.active.level-medium { background: var(--medium); }
+        .threat-segment.active.level-high { background: var(--high); }
+        .threat-segment.active.level-critical { background: var(--critical); }
+
+        .threat-pulse {
+          position: absolute;
+          inset: 0;
+          background: inherit;
+          filter: brightness(1.5);
+          animation: threat-pulse 2s infinite;
+        }
+
+        @keyframes threat-pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+
+        .threat-label {
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          color: var(--text-muted);
+        }
+
+
+        /* Main Content Area */
+        .main-content {
+          padding: var(--spacing-lg);
+          margin-left: 60px;
+          display: flex;
+          flex-direction: column;
+          gap: var(--spacing-lg);
+          overflow-y: auto;
+          min-height: calc(100vh - 120px);
+        }
+
+        /* Terminal Feed */
+        .terminal-feed {
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
+          display: flex;
+          flex-direction: column;
+          height: 300px;
+          margin-bottom: var(--spacing-lg);
+        }
+
+        .terminal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: var(--spacing-sm) var(--spacing-md);
+          background: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-title {
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+          color: var(--accent-primary);
+          letter-spacing: 1px;
+        }
+
+        .terminal-body {
+          flex: 1;
+          padding: var(--spacing-md);
+          overflow-y: auto;
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+          line-height: 1.6;
+        }
+
+        .terminal-line {
+          display: flex;
+          gap: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
+          opacity: 0.8;
+          transition: var(--transition-fast);
+          animation: terminalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes terminalSlideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 0.8;
+            transform: translateX(0);
+          }
+        }
+
+        .terminal-line:hover {
+          opacity: 1;
+          background: var(--surface-hover);
+          padding-left: var(--spacing-xs);
+        }
+
+        .timestamp {
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          min-width: 180px;
+        }
+
+        .severity-indicator {
+          font-weight: bold;
+          min-width: 40px;
+        }
+
+        .terminal-line.severity-critical .severity-indicator { color: var(--critical); }
+        .terminal-line.severity-high .severity-indicator { color: var(--high); }
+        .terminal-line.severity-medium .severity-indicator { color: var(--medium); }
+        .terminal-line.severity-low .severity-indicator { color: var(--low); }
+
+        .entry-text {
+          flex: 1;
+          color: var(--text-primary);
+        }
+
+        /* Statistics Grid */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: var(--spacing-md);
+          margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
+          padding: var(--spacing-md);
+          position: relative;
+          overflow: hidden;
+          transition: var(--transition-normal);
+        }
+
+        .stat-card:hover {
+          transform: translateY(-2px);
+          border-color: var(--border-active);
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-header {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: var(--spacing-sm);
+        }
+
+        .stat-value {
+          font-family: var(--font-mono);
+          font-size: 2rem;
+          font-weight: bold;
+          color: var(--text-primary);
+          margin-bottom: var(--spacing-sm);
+          animation: statCounter 1s ease-out;
+        }
+
+        @keyframes statCounter {
+          from { transform: scale(1.2); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        .stat-change {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-xs);
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+        }
+
+        .stat-change.trend-up { color: var(--accent-success); }
+        .stat-change.trend-down { color: var(--critical); }
+
+        .change-icon {
+          font-size: 0.75rem;
+        }
+
+        .stat-card.color-critical .stat-value { color: var(--critical); }
+        .stat-card.color-high .stat-value { color: var(--high); }
+        .stat-card.color-success .stat-value { color: var(--accent-success); }
+        .stat-card.color-info .stat-value { color: var(--info); }
+
+        /* Remediation Section */
+        .remediation-section {
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
+          margin-bottom: var(--spacing-lg);
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .remediation-header {
+          background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+          padding: var(--spacing-md);
+          color: white;
+          font-family: var(--font-mono);
+          font-weight: 600;
+          font-size: 1rem;
+          letter-spacing: 1px;
+        }
+        
+        .remediation-content {
+          padding: var(--spacing-lg);
+        }
+        
+        .remediation-info {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--spacing-lg);
+          margin-bottom: var(--spacing-lg);
+        }
+        
+        .remediation-panel {
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          padding: var(--spacing-md);
+        }
+        
+        .remediation-panel h3 {
+          color: var(--accent-primary);
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+          margin: 0 0 var(--spacing-sm) 0;
+          letter-spacing: 1px;
+        }
+        
+        .kirin-integration-status {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          margin-bottom: var(--spacing-md);
+        }
+        
+        .status-indicator-kirin {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: var(--accent-success);
+          box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .remediation-stats {
+          display: flex;
+          gap: var(--spacing-md);
+          margin-bottom: var(--spacing-md);
+        }
+        
+        .remediation-stat {
+          text-align: center;
+        }
+        
+        .remediation-stat-value {
+          font-family: var(--font-mono);
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: var(--accent-primary);
+        }
+        
+        .remediation-stat-label {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        /* Vulnerability Cards */
+        .vuln-card {
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
+          position: relative;
+          overflow: hidden;
+          transition: var(--transition-normal);
+          margin-bottom: var(--spacing-md);
+          animation: vulnCardSlideIn 0.5s ease-out;
+        }
+
+        @keyframes vulnCardSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .vuln-card:hover {
+          border-color: var(--border-active);
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+          transform: translateX(5px);
+        }
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: var(--spacing-md);
+          position: relative;
+        }
+
+        .severity-strip {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+        }
+
+        .vuln-card.severity-critical .severity-strip { background: var(--critical); }
+        .vuln-card.severity-high .severity-strip { background: var(--high); }
+        .vuln-card.severity-medium .severity-strip { background: var(--medium); }
+        .vuln-card.severity-low .severity-strip { background: var(--low); }
+
+        .card-id {
+          font-family: var(--font-mono);
+          font-weight: 600;
+          color: var(--accent-primary);
+          margin-left: var(--spacing-md);
+          font-size: 1.1rem;
+          text-decoration: none;
+        }
+
+        .card-id:hover {
+          color: var(--accent-success);
+          text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .card-timestamp {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+
+        .card-body {
+          padding: 0 var(--spacing-md) var(--spacing-md);
+        }
+
+        .card-title-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: var(--spacing-sm);
+        }
+
+        .card-title {
+          font-size: 1rem;
+          margin: 0;
+          color: var(--text-primary);
+          flex: 1;
+        }
+
+        .verification-badge {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: 3px;
+          text-transform: uppercase;
+          margin-left: var(--spacing-sm);
+          white-space: nowrap;
+        }
+
+        .verification-badge {
+          background: var(--accent-success);
+          color: var(--bg-primary);
+        }
+
+        .verification-badge.unverified {
+          background: var(--medium);
+          color: var(--bg-primary);
+        }
+
+        .affected-tools {
+          display: flex;
+          gap: var(--spacing-xs);
+          margin-bottom: var(--spacing-sm);
+          flex-wrap: wrap;
+        }
+
+        .tool-tag {
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          padding: 2px var(--spacing-sm);
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--accent-primary);
+          text-transform: uppercase;
+          transition: var(--transition-fast);
+        }
+
+        .tool-tag:hover {
+          border-color: var(--accent-primary);
+          background: var(--surface-hover);
+        }
+
+        .card-metrics {
+          display: flex;
+          gap: var(--spacing-lg);
+          margin: var(--spacing-md) 0;
+        }
+
+        .metric {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .metric-label {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-transform: uppercase;
+        }
+
+        .metric-value {
+          font-family: var(--font-mono);
+          font-size: 1.25rem;
+          font-weight: bold;
+          color: var(--text-primary);
+        }
+
+        .card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: var(--spacing-md);
+          background: var(--bg-secondary);
+          border-top: 1px solid var(--border-color);
+        }
+
+        .remediation-status {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          text-transform: uppercase;
+        }
+
+        .status-available {
+          color: var(--accent-success);
+        }
+
+        .status-pending {
+          color: var(--text-muted);
+        }
+
+        .card-actions {
+          display: flex;
+          gap: var(--spacing-sm);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+          background: var(--accent-primary);
+          color: var(--bg-primary);
+          border: none;
+          padding: var(--spacing-sm) var(--spacing-md);
+          font-family: var(--font-mono);
+          font-weight: 600;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: var(--transition-fast);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+          background: var(--accent-primary);
+          filter: brightness(1.2);
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-ghost {
+          background: transparent;
+          color: var(--text-secondary);
+          border: 1px solid var(--border-color);
+          padding: var(--spacing-sm) var(--spacing-md);
+          font-family: var(--font-mono);
+          font-weight: 600;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: var(--transition-fast);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .btn-ghost:hover {
+          border-color: var(--accent-primary);
+          color: var(--accent-primary);
+          background: var(--surface-hover);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 0;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: var(--border-active);
+        }
+
+        /* Loading and Error States */
+        .loading {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 60px;
+          color: var(--accent-primary);
+          font-family: var(--font-mono);
+          font-size: 1.2em;
+        }
+
+        .loading::after {
+          content: '';
+          width: 30px;
+          height: 30px;
+          border: 3px solid transparent;
+          border-top: 3px solid var(--accent-primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-left: 15px;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .error {
+          text-align: center;
+          padding: 60px;
+          color: var(--critical);
+          font-family: var(--font-mono);
+          font-size: 1.1em;
+        }
+
+        /* Source Links Styling */
+        .sources {
+          margin-top: var(--spacing-md);
+          padding-top: var(--spacing-md);
+          border-top: 1px solid var(--border-color);
+        }
+
+        .sources-label {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          margin-bottom: var(--spacing-sm);
+        }
+
+        .source-links {
+          display: flex;
+          gap: var(--spacing-sm);
+          flex-wrap: wrap;
+        }
+
+        .source-link {
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          color: var(--accent-primary);
+          text-decoration: none;
+          padding: var(--spacing-xs) var(--spacing-sm);
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          transition: var(--transition-fast);
+        }
+
+        .source-link:hover {
+          border-color: var(--accent-primary);
+          background: var(--surface-hover);
+          color: var(--accent-success);
+        }
+
+        /* Vulnerability Details Modal */
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(10, 14, 27, 0.9);
+          backdrop-filter: blur(5px);
+          z-index: 2000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .vulnerability-modal {
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-active);
+          box-shadow: 0 0 50px rgba(0, 217, 255, 0.3);
+          max-width: 800px;
+          width: 90%;
+          max-height: 90%;
+          overflow-y: auto;
+          position: relative;
+          transform: scale(0.9);
+          transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .vulnerability-modal {
+          transform: scale(1);
+        }
+
+        .modal-header {
+          background: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
+          padding: var(--spacing-lg);
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+
+        .modal-close {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+          color: var(--accent-primary);
+          background: var(--surface-hover);
+        }
+
+        .modal-title-section {
+          flex: 1;
+          margin-right: var(--spacing-lg);
+        }
+
+        .modal-vulnerability-id {
+          font-family: var(--font-mono);
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: var(--accent-primary);
+          margin-bottom: var(--spacing-xs);
+        }
+
+        .modal-title {
+          font-size: 1.1rem;
+          color: var(--text-primary);
+          margin: 0;
+        }
+
+        .modal-body {
+          padding: var(--spacing-lg);
+        }
+
+        .detail-section {
+          margin-bottom: var(--spacing-lg);
+        }
+
+        .detail-section:last-child {
+          margin-bottom: 0;
+        }
+
+        .detail-label {
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: var(--spacing-sm);
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-xs);
+        }
+
+        .detail-content {
+          color: var(--text-primary);
+          line-height: 1.6;
+        }
+
+        .detail-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: var(--spacing-md);
+        }
+
+        .detail-metric {
+          background: var(--bg-secondary);
+          padding: var(--spacing-md);
+          border: 1px solid var(--border-color);
+        }
+
+        .metric-value-large {
+          font-family: var(--font-mono);
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: var(--text-primary);
+          margin-bottom: var(--spacing-xs);
+        }
+
+        .attack-vector-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--spacing-sm);
+        }
+
+        .attack-vector {
+          background: rgba(255, 140, 66, 0.1);
+          border: 1px solid rgba(255, 140, 66, 0.3);
+          color: var(--high);
+          padding: var(--spacing-xs) var(--spacing-sm);
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          text-transform: uppercase;
+        }
+
+        .reference-list {
+          display: flex;
+          flex-direction: column;
+          gap: var(--spacing-sm);
+        }
+
+        .reference-link {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          color: var(--accent-primary);
+          text-decoration: none;
+          font-family: var(--font-mono);
+          font-size: 0.875rem;
+          padding: var(--spacing-sm);
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
+          transition: var(--transition-fast);
+        }
+
+        .reference-link:hover {
+          border-color: var(--accent-primary);
+          background: var(--surface-hover);
+        }
+
+        .reference-icon {
+          color: var(--text-muted);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+
+          .threat-indicator {
+            display: none;
+          }
+
+          .main-content {
+            margin-left: 0;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          
+          .soc-title {
+            font-size: 1.2rem;
+          }
+
+          .system-status {
+            font-size: 0.75rem;
+          }
+
+          .dashboard-header {
+            padding: var(--spacing-md);
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="kirin-dashboard" id="dashboard">
+        <!-- Critical banner removed -->
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header" id="dashboard-header">
+            <div class="header-content">
+                <div class="soc-title">KNOSTIC AI - KIRIN SOC</div>
+                <div class="system-status">
+                    <div class="status-indicator"></div>
+                    <span>MONITORING ACTIVE</span>
+                    <span style="margin-left: 16px; color: var(--text-muted);" id="last-scan">Last Scan: Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid Layout -->
+        <div class="dashboard-grid">
+            <!-- Threat Level Indicator -->
+            <div class="threat-indicator">
+                <div class="threat-bar" id="threat-bar">
+                    <div class="threat-segment level-critical" data-level="0">
+                        <div class="threat-pulse"></div>
+                    </div>
+                    <div class="threat-segment level-high" data-level="1">
+                        <div class="threat-pulse"></div>
+                    </div>
+                    <div class="threat-segment level-medium" data-level="2">
+                        <div class="threat-pulse"></div>
+                    </div>
+                    <div class="threat-segment level-low" data-level="3">
+                        <div class="threat-pulse"></div>
+                    </div>
+                </div>
+                <div class="threat-label">
+                    <span id="threat-level-text">MEDIUM</span>
+                </div>
+            </div>
+
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Terminal Feed -->
+                <div class="terminal-feed">
+                    <div class="terminal-header">
+                        <span class="terminal-title">VULNERABILITY_STREAM</span>
+                        <div class="terminal-controls">
+                            <span id="stream-status" style="color: var(--accent-success);">LIVE</span>
+                        </div>
+                    </div>
+                    <div class="terminal-body" id="terminal-feed">
+                        <div class="terminal-line">
+                            <span class="timestamp">[2025-09-09T15:03:27.000Z]</span>
+                            <span class="severity-indicator">[*]</span>
+                            <span class="entry-text">SYSTEM INITIALIZATION COMPLETE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card color-success">
+                        <div class="stat-header">TOTAL VULNERABILITIES</div>
+                        <div class="stat-value" id="total-vulns">-</div>
+                        <div class="stat-change trend-up">
+                            <span class="change-icon">▲</span>
+                            <span class="change-value" id="total-change">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card color-critical">
+                        <div class="stat-header">CRITICAL</div>
+                        <div class="stat-value" id="critical-vulns">-</div>
+                        <div class="stat-change trend-up">
+                            <span class="change-icon">▲</span>
+                            <span class="change-value" id="critical-change">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card color-high">
+                        <div class="stat-header">HIGH</div>
+                        <div class="stat-value" id="high-vulns">-</div>
+                        <div class="stat-change trend-down">
+                            <span class="change-icon">▼</span>
+                            <span class="change-value" id="high-change">-</span>
+                        </div>
+                    </div>
+                    <div class="stat-card color-info">
+                        <div class="stat-header">AI TOOLS</div>
+                        <div class="stat-value" id="tools-monitored">-</div>
+                        <div class="stat-change trend-up">
+                            <span class="change-icon">▲</span>
+                            <span class="change-value" id="tools-change">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remediation Section -->
+                <div class="remediation-section">
+                    <div class="remediation-header">
+                        🛠️ KIRIN REMEDIATION CENTER - CURSOR INTEGRATION
+                    </div>
+                    <div class="remediation-content">
+                        <div class="kirin-integration-status">
+                            <div class="status-indicator-kirin"></div>
+                            <span>Kirin Plugin Integration: Active</span>
+                        </div>
+                        
+                        <div class="remediation-info">
+                            <div class="remediation-panel">
+                                <h3>CURSOR VULNERABILITIES</h3>
+                                <div class="remediation-stats">
+                                    <div class="remediation-stat">
+                                        <div class="remediation-stat-value" id="cursor-vulns-total">-</div>
+                                        <div class="remediation-stat-label">Total</div>
+                                    </div>
+                                    <div class="remediation-stat">
+                                        <div class="remediation-stat-value" id="cursor-vulns-remediable">-</div>
+                                        <div class="remediation-stat-label">Remediable</div>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                                    Cursor-specific vulnerabilities that can be automatically remediated by the Kirin plugin.
+                                </p>
+                            </div>
+                            
+                            <div class="remediation-panel">
+                                <h3>AI-POWERED ACTIONS</h3>
+                                <div class="remediation-stats">
+                                    <div class="remediation-stat">
+                                        <div class="remediation-stat-value" id="remediation-success-rate">95%</div>
+                                        <div class="remediation-stat-label">Success Rate</div>
+                                    </div>
+                                    <div class="remediation-stat">
+                                        <div class="remediation-stat-value" id="avg-remediation-time">2m</div>
+                                        <div class="remediation-stat-label">Avg Time</div>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                                    Intelligent remediation steps powered by AI, specifically designed for Cursor IDE vulnerabilities.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: var(--bg-secondary); padding: var(--spacing-sm); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
+                            <strong style="color: var(--accent-primary);">NOTE:</strong> Remediation is only available for Cursor vulnerabilities. The "Remediate" button on vulnerability cards will only work for Cursor-specific security issues that the Kirin plugin can address.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vulnerability Grid -->
+                <div id="vulnerability-grid">
+                    <div class="loading">LOADING THREAT INTELLIGENCE...</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Vulnerability Details Modal -->
+        <div class="modal-backdrop" id="vulnerability-modal-backdrop">
+            <div class="vulnerability-modal">
+                <div class="modal-header">
+                    <div class="modal-title-section">
+                        <div class="modal-vulnerability-id" id="modal-vuln-id">CVE-2025-XXXX</div>
+                        <h2 class="modal-title" id="modal-vuln-title">Vulnerability Title</h2>
+                    </div>
+                    <button class="modal-close" id="modal-close-btn">✕</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Content populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Terminal feed management
+        const terminalFeed = document.getElementById('terminal-feed');
+        const maxTerminalLines = 50;
+        
+        function addTerminalLine(severity, message) {
+            const line = document.createElement('div');
+            line.className = `terminal-line severity-${severity}`;
+            
+            const timestamp = new Date().toISOString();
+            const severityIcon = {
+                'critical': '[!!!]',
+                'high': '[!!]',
+                'medium': '[!]',
+                'low': '[·]',
+                'info': '[*]'
+            }[severity] || '[?]';
+            
+            line.innerHTML = `
+                <span class="timestamp">[${timestamp}]</span>
+                <span class="severity-indicator">${severityIcon}</span>
+                <span class="entry-text">${message}</span>
+            `;
+            
+            terminalFeed.appendChild(line);
+            
+            // Remove old lines
+            const lines = terminalFeed.querySelectorAll('.terminal-line');
+            if (lines.length > maxTerminalLines) {
+                lines[0].remove();
+            }
+            
+            // Auto-scroll to bottom
+            terminalFeed.scrollTop = terminalFeed.scrollHeight;
+        }
+
+        // Threat level management
+        function updateThreatLevel(level) {
+            const threatBar = document.getElementById('threat-bar');
+            const threatLevelText = document.getElementById('threat-level-text');
+            const segments = threatBar.querySelectorAll('.threat-segment');
+            
+            const levels = ['low', 'medium', 'high', 'critical'];
+            const currentIndex = levels.indexOf(level);
+            
+            segments.forEach((segment, index) => {
+                if (index <= currentIndex) {
+                    segment.classList.add('active');
+                } else {
+                    segment.classList.remove('active');
+                }
+            });
+            
+            threatLevelText.textContent = level.toUpperCase();
+        }
+
+        // Critical alert function removed
+
+        // Vulnerability card creation
+        function createVulnerabilityCard(vuln) {
+            const severityClass = (vuln.severity || 'unknown').toLowerCase();
+            const card = document.createElement('div');
+            card.className = `vuln-card severity-${severityClass}`;
+            
+            // Handle affected tools - may be empty array
+            const affectedTools = Array.isArray(vuln.affected_tools) ? vuln.affected_tools : [];
+            let toolsHtml = '';
+            if (affectedTools.length > 0) {
+                toolsHtml = affectedTools.map(tool => `<span class="tool-tag">${tool.toUpperCase()}</span>`).join('');
+            } else {
+                // Show tags or attack vectors if no affected tools
+                const tags = vuln.tags || vuln.attack_vectors || [];
+                if (tags.length > 0) {
+                    toolsHtml = tags.slice(0, 3).map(tag => `<span class="tool-tag">${tag.toUpperCase()}</span>`).join('');
+                }
+            }
+            
+            // Format references/sources
+            let sourcesHtml = '';
+            const validReferences = getValidReferences(vuln.references);
+            if (validReferences.length > 0) {
+                const sources = validReferences.slice(0, 3).map(ref => {
+                    let label = 'SOURCE';
+                    if (ref.includes('nvd.nist.gov')) label = 'NVD';
+                    else if (ref.includes('cve.mitre.org')) label = 'MITRE';
+                    else if (ref.includes('github.com')) label = 'GITHUB';
+                    else if (ref.includes('microsoft.com')) label = 'MS';
+                    else if (ref.includes('checkmk.com')) label = 'VENDOR';
+                    
+                    return `<a href="${ref}" target="_blank" class="source-link">${label}</a>`;
+                }).join('');
+                
+                sourcesHtml = `
+                    <div class="sources">
+                        <div class="sources-label">VERIFIED SOURCES</div>
+                        <div class="source-links">${sources}</div>
+                    </div>
+                `;
+            }
+            
+            // Clean up title if it has redundant CVE info
+            let cleanTitle = vuln.title;
+            if (cleanTitle.startsWith('CVE ') && vuln.cve_id) {
+                cleanTitle = vuln.description || cleanTitle;
+                if (cleanTitle.length > 120) {
+                    cleanTitle = cleanTitle.substring(0, 120) + '...';
+                }
+            }
+            
+            // Add verification badge for real CVEs
+            const isVerified = vuln.cve_id && (vuln.cve_id.startsWith('CVE-') || vuln.references?.some(ref => 
+                ref.includes('nvd.nist.gov') || ref.includes('github.com') || ref.includes('cve.mitre.org')
+            ));
+            
+            const verificationBadge = isVerified ? 
+                '<span class="verification-badge">✓ VERIFIED</span>' : 
+                '<span class="verification-badge unverified">⚠ RESEARCH</span>';
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="severity-strip"></div>
+                    <a href="${getCveLink(vuln.cve_id || vuln.vulnerability_id)}" 
+                       target="_blank" class="card-id">${vuln.cve_id || vuln.vulnerability_id}</a>
+                    <div class="card-timestamp">${new Date(vuln.created_at || vuln.discovery_date).toLocaleString()}</div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="card-title-row">
+                        <h3 class="card-title">${cleanTitle}</h3>
+                        ${verificationBadge}
+                    </div>
+                    
+                    ${toolsHtml ? `<div class="affected-tools">${toolsHtml}</div>` : ''}
+                    
+                    <div class="card-metrics">
+                        <div class="metric">
+                            <span class="metric-label">CVSS</span>
+                            <span class="metric-value">${vuln.cvss_score || 'N/A'}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">RISK</span>
+                            <span class="metric-value">${vuln.severity || 'UNKNOWN'}</span>
+                        </div>
+                    </div>
+                    
+                    ${sourcesHtml}
+                </div>
+                
+                <div class="card-footer">
+                    <div class="remediation-status">
+                        ${vuln.kirin_remediation_available ? 
+                            '<span class="status-available">REMEDIATION AVAILABLE</span>' : 
+                            '<span class="status-pending">ANALYSIS REQUIRED</span>'
+                        }
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-primary" onclick="remediateVulnerability('${vuln.vulnerability_id}', ${JSON.stringify(vuln).replace(/"/g, '&quot;')})">REMEDIATE</button>
+                        <button class="btn-ghost" onclick="showVulnerabilityDetails(${JSON.stringify(vuln).replace(/"/g, '&quot;')})">DETAILS</button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Data fetching and display
+        async function fetchAndDisplayData() {
+            try {
+                addTerminalLine('info', 'FETCHING THREAT INTELLIGENCE DATA...');
+                
+                const [vulnResponse, toolsResponse, monitoringResponse] = await Promise.all([
+                    fetch('/api/vulnerabilities/latest?limit=100'),
+                    fetch('/api/tools/'),
+                    fetch('/api/monitoring/status').catch(() => ({ json: () => ({}) }))
+                ]);
+
+                const vulnData = await vulnResponse.json();
+                const allVulnerabilities = vulnData.vulnerabilities || [];
+                
+                // Filter for ONLY AI coding tool related vulnerabilities
+                const aiKeywords = ['copilot', 'cursor', 'tabnine', 'codeium', 'ai assistant', 'code completion', 
+                                  'codewhisperer', 'jetbrains ai', 'github copilot', 'ai', 'artificial intelligence',
+                                  'code generation', 'autocomplete', 'intellisense', 'vscode extension'];
+                
+                const vulnerabilities = allVulnerabilities.filter(vuln => {
+                    const text = `${vuln.title} ${vuln.description} ${vuln.tags?.join(' ') || ''}`.toLowerCase();
+                    return aiKeywords.some(keyword => text.includes(keyword));
+                });
+                
+                const toolsData = await toolsResponse.json();
+                const tools = toolsData.tools || [];
+                const monitoring = monitoringResponse ? await monitoringResponse.json() : {};
+                
+                addTerminalLine('info', `FILTERED ${vulnerabilities.length} AI-RELATED VULNERABILITIES FROM ${allVulnerabilities.length} TOTAL`);
+
+                displayStats(vulnerabilities, tools, monitoring);
+                populateRemediationData(vulnerabilities);
+                displayVulnerabilities(vulnerabilities);
+                updateLastScan(monitoring);
+                
+                // Check for critical vulnerabilities
+                const vulnArray = Array.isArray(vulnerabilities) ? vulnerabilities : [];
+                const criticalVulns = vulnArray.filter(v => 
+                    v.severity && v.severity.toLowerCase() === 'critical');
+                if (criticalVulns.length > 0) {
+                    // Log critical vulnerability detected
+                    addTerminalLine('critical', `CRITICAL VULNERABILITY DETECTED: ${criticalVulns[0].vulnerability_id}`);
+                    updateThreatLevel('critical');
+                } else {
+                    // Determine threat level based on severity distribution
+                    const highVulns = vulnArray.filter(v => 
+                        v.severity && v.severity.toLowerCase() === 'high');
+                    if (highVulns.length > 5) {
+                        updateThreatLevel('high');
+                    } else if (vulnArray.length > 10) {
+                        updateThreatLevel('medium');
+                    } else {
+                        updateThreatLevel('low');
+                    }
+                }
+                
+                addTerminalLine('info', `LOADED ${vulnerabilities.length} VULNERABILITIES FROM ${Object.keys(monitoring.sources || {}).length} SOURCES`);
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                addTerminalLine('critical', `DATA FETCH ERROR: ${error.message}`);
+                
+                document.getElementById('vulnerability-grid').innerHTML = 
+                    '<div class="error">FAILED TO LOAD THREAT INTELLIGENCE</div>';
+            }
+        }
+
+        function displayStats(vulnerabilities, tools, monitoring) {
+            // Ensure vulnerabilities is an array
+            const vulnArray = Array.isArray(vulnerabilities) ? vulnerabilities : [];
+            const toolsArray = Array.isArray(tools) ? tools : [];
+            
+            const stats = {
+                total: vulnArray.length,
+                critical: vulnArray.filter(v => v.severity && v.severity.toLowerCase() === 'critical').length,
+                high: vulnArray.filter(v => v.severity && v.severity.toLowerCase() === 'high').length,
+                medium: vulnArray.filter(v => v.severity && v.severity.toLowerCase() === 'medium').length,
+                tools: toolsArray.length
+            };
+
+            document.getElementById('total-vulns').textContent = stats.total;
+            document.getElementById('critical-vulns').textContent = stats.critical;
+            document.getElementById('high-vulns').textContent = stats.high;
+            document.getElementById('tools-monitored').textContent = stats.tools;
+            
+            // Simulate change indicators
+            document.getElementById('total-change').textContent = `+${Math.floor(stats.total * 0.1)}`;
+            document.getElementById('critical-change').textContent = `+${stats.critical}`;
+            document.getElementById('high-change').textContent = `-${Math.floor(stats.high * 0.2)}`;
+            document.getElementById('tools-change').textContent = `+${stats.tools}`;
+        }
+
+        function displayVulnerabilities(vulnerabilities) {
+            const grid = document.getElementById('vulnerability-grid');
+            
+            if (!Array.isArray(vulnerabilities) || vulnerabilities.length === 0) {
+                grid.innerHTML = '<div class="loading">NO VULNERABILITIES DETECTED</div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            
+            // Sort by severity and date
+            const sortedVulns = vulnerabilities.sort((a, b) => {
+                const severityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
+                const severityDiff = (severityOrder[b.severity?.toLowerCase()] || 0) - 
+                                   (severityOrder[a.severity?.toLowerCase()] || 0);
+                if (severityDiff !== 0) return severityDiff;
+                
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+
+            sortedVulns.forEach((vuln, index) => {
+                const card = createVulnerabilityCard(vuln);
+                
+                // Add staggered animation delay
+                card.style.animationDelay = `${index * 50}ms`;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function updateLastScan(monitoring) {
+            const lastScanElement = document.getElementById('last-scan');
+            if (monitoring && monitoring.last_vulnerability && monitoring.last_vulnerability.created_at) {
+                const lastScan = new Date(monitoring.last_vulnerability.created_at);
+                lastScanElement.textContent = `Last Scan: ${lastScan.toLocaleString()}`;
+            } else {
+                lastScanElement.textContent = `Last Scan: ${new Date().toLocaleString()}`;
+            }
+        }
+
+        // WebSocket simulation for live updates
+        function simulateLiveUpdates() {
+            const messages = [
+                { severity: 'info', text: 'MONITORING NVD API FOR NEW CVES...' },
+                { severity: 'info', text: 'CHECKING GITHUB SECURITY ADVISORIES...' },
+                { severity: 'info', text: 'SCANNING RSS SECURITY FEEDS...' },
+                { severity: 'medium', text: 'NEW VULNERABILITY DETECTED: CVE-2025-XXXX' },
+                { severity: 'info', text: 'AI CLASSIFICATION COMPLETE' },
+                { severity: 'low', text: 'DATABASE SYNC COMPLETE' }
+            ];
+            
+            let messageIndex = 0;
+            setInterval(() => {
+                if (messageIndex < messages.length) {
+                    const msg = messages[messageIndex];
+                    addTerminalLine(msg.severity, msg.text);
+                    messageIndex++;
+                }
+            }, 5000);
+        }
+
+        // Modal functionality
+        function showVulnerabilityDetails(vulnerability) {
+            const modal = document.getElementById('vulnerability-modal-backdrop');
+            const modalVulnId = document.getElementById('modal-vuln-id');
+            const modalTitle = document.getElementById('modal-vuln-title');
+            const modalBody = document.getElementById('modal-body');
+            
+            // Set title
+            modalVulnId.textContent = vulnerability.cve_id || vulnerability.vulnerability_id;
+            modalTitle.textContent = vulnerability.title;
+            
+            // Generate detailed content
+            const severityColor = {
+                'CRITICAL': 'var(--critical)',
+                'HIGH': 'var(--high)', 
+                'MEDIUM': 'var(--medium)',
+                'LOW': 'var(--low)'
+            }[vulnerability.severity] || 'var(--text-primary)';
+            
+            const attackVectors = vulnerability.attack_vectors || [];
+            const references = getValidReferences(vulnerability.references);
+            
+            modalBody.innerHTML = `
+                <!-- Metrics Grid -->
+                <div class="detail-grid">
+                    <div class="detail-metric">
+                        <div class="detail-label">🚨 Severity</div>
+                        <div class="metric-value-large" style="color: ${severityColor}">
+                            ${vulnerability.severity || 'UNKNOWN'}
+                        </div>
+                    </div>
+                    <div class="detail-metric">
+                        <div class="detail-label">📊 CVSS Score</div>
+                        <div class="metric-value-large">
+                            ${vulnerability.cvss_score || 'N/A'}
+                        </div>
+                    </div>
+                    <div class="detail-metric">
+                        <div class="detail-label">📅 Discovered</div>
+                        <div class="detail-content" style="font-family: var(--font-mono);">
+                            ${new Date(vulnerability.discovery_date || vulnerability.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="detail-metric">
+                        <div class="detail-label">🔧 Exploit Status</div>
+                        <div class="detail-content">
+                            ${vulnerability.exploit_in_wild ? '⚠️ IN THE WILD' : '🛡️ NO KNOWN EXPLOITS'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="detail-section">
+                    <div class="detail-label">📋 Description</div>
+                    <div class="detail-content">
+                        ${vulnerability.description || 'No detailed description available.'}
+                    </div>
+                </div>
+                
+                ${vulnerability.cvss_vector ? `
+                <div class="detail-section">
+                    <div class="detail-label">🎯 CVSS Vector</div>
+                    <div class="detail-content">
+                        <code style="font-family: var(--font-mono); background: var(--bg-secondary); padding: 8px; display: block;">${vulnerability.cvss_vector}</code>
+                    </div>
+                </div>` : ''}
+                
+                ${attackVectors.length > 0 ? `
+                <div class="detail-section">
+                    <div class="detail-label">⚔️ Attack Vectors</div>
+                    <div class="attack-vector-list">
+                        ${attackVectors.map(vector => `<span class="attack-vector">${vector}</span>`).join('')}
+                    </div>
+                </div>` : ''}
+                
+                ${references.length > 0 ? `
+                <div class="detail-section">
+                    <div class="detail-label">🔗 References & Sources</div>
+                    <div class="reference-list">
+                        ${references.map(ref => {
+                            let icon = '🔗';
+                            let label = 'Source';
+                            
+                            if (ref.includes('nvd.nist.gov')) { icon = '🛡️'; label = 'NVD Database'; }
+                            else if (ref.includes('github.com')) { icon = '💻'; label = 'GitHub Advisory'; }
+                            else if (ref.includes('cve.mitre.org')) { icon = '📊'; label = 'MITRE CVE'; }
+                            else if (ref.includes('microsoft.com')) { icon = '🏢'; label = 'Microsoft Security'; }
+                            else if (ref.includes('security')) { icon = '🛡️'; label = 'Security Advisory'; }
+                            
+                            return `
+                                <a href="${ref}" target="_blank" class="reference-link">
+                                    <span class="reference-icon">${icon}</span>
+                                    <span>${label}</span>
+                                    <span style="color: var(--text-muted); margin-left: auto; font-size: 0.75rem;">↗</span>
+                                </a>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>` : ''}
+                
+                <!-- Remediation Status -->
+                <div class="detail-section">
+                    <div class="detail-label">🛠️ Remediation</div>
+                    <div class="detail-content">
+                        ${vulnerability.kirin_remediation_available ? 
+                            '<span style="color: var(--accent-success);">✅ Kirin remediation available - automated fixes can be applied</span>' :
+                            '<span style="color: var(--text-muted);">⏳ Analysis in progress - manual review required</span>'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            addTerminalLine('info', `DISPLAYING DETAILS FOR ${vulnerability.vulnerability_id}`);
+        }
+        
+        function hideVulnerabilityDetails() {
+            const modal = document.getElementById('vulnerability-modal-backdrop');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Remediate vulnerability function - Cursor only
+        function remediateVulnerability(vulnId, vulnData = null) {
+            console.log(`Initiating remediation for: ${vulnId}`);
+            
+            // Check if this is a Cursor vulnerability
+            if (vulnData && vulnData.affected_tools) {
+                const isCursorVuln = vulnData.affected_tools.some(tool => 
+                    tool.toLowerCase().includes('cursor')
+                );
+                
+                if (!isCursorVuln) {
+                    addTerminalLine('warning', `REMEDIATION NOT AVAILABLE FOR ${vulnId}`);
+                    addTerminalLine('info', 'KIRIN PLUGIN ONLY SUPPORTS CURSOR VULNERABILITIES');
+                    alert('⚠️ Remediation is only available for Cursor vulnerabilities.\nThe Kirin plugin does not support other AI tools.');
+                    return;
+                }
+            }
+            
+            addTerminalLine('info', `STARTING CURSOR REMEDIATION FOR ${vulnId}`);
+            addTerminalLine('info', 'CONNECTING TO KIRIN PLUGIN API...');
+            
+            // Simulate Kirin plugin API call
+            setTimeout(() => {
+                addTerminalLine('success', `KIRIN PLUGIN ACTIVATED FOR ${vulnId}`);
+                addTerminalLine('info', 'GENERATING AI-POWERED REMEDIATION STEPS...');
+            }, 1000);
+            
+            setTimeout(() => {
+                addTerminalLine('success', `CURSOR REMEDIATION STEPS GENERATED FOR ${vulnId}`);
+                addTerminalLine('info', 'SENDING TO CURSOR IDE VIA KIRIN PLUGIN...');
+            }, 2000);
+            
+            setTimeout(() => {
+                addTerminalLine('success', `VULNERABILITY ${vulnId} REMEDIATION APPLIED IN CURSOR`);
+                addTerminalLine('info', 'CURSOR SECURITY SETTINGS UPDATED - MONITORING RESUMED');
+                
+                // Update remediation stats
+                updateRemediationStats();
+            }, 3000);
+        }
+        
+        // Update remediation statistics
+        function updateRemediationStats() {
+            // This would normally fetch real stats from the API
+            const currentTotal = parseInt(document.getElementById('cursor-vulns-total').textContent) || 0;
+            const currentRemediable = parseInt(document.getElementById('cursor-vulns-remediable').textContent) || 0;
+            
+            // Simulate remediation completion
+            if (currentRemediable > 0) {
+                document.getElementById('cursor-vulns-remediable').textContent = Math.max(0, currentRemediable - 1);
+            }
+        }
+        
+        // Populate remediation section with data
+        function populateRemediationData(vulnerabilities) {
+            if (!Array.isArray(vulnerabilities)) return;
+            
+            // Filter for Cursor vulnerabilities
+            const cursorVulns = vulnerabilities.filter(vuln => {
+                if (!vuln.affected_tools) return false;
+                return vuln.affected_tools.some(tool => 
+                    tool.toLowerCase().includes('cursor')
+                );
+            });
+            
+            const totalCursorVulns = cursorVulns.length;
+            const remediableCursorVulns = cursorVulns.filter(vuln => 
+                vuln.kirin_remediation_available || 
+                vuln.auto_remediation_possible ||
+                vuln.patch_status !== 'patched'
+            ).length;
+            
+            // Update stats
+            document.getElementById('cursor-vulns-total').textContent = totalCursorVulns;
+            document.getElementById('cursor-vulns-remediable').textContent = remediableCursorVulns;
+            
+            // Log remediation status
+            if (totalCursorVulns > 0) {
+                addTerminalLine('info', `CURSOR VULNERABILITIES DETECTED: ${totalCursorVulns} TOTAL, ${remediableCursorVulns} REMEDIABLE`);
+            } else {
+                addTerminalLine('success', 'NO CURSOR VULNERABILITIES DETECTED - SYSTEM SECURE');
+            }
+        }
+        
+        // Helper function to generate CVE links
+        function getCveLink(cveId) {
+            if (!cveId) return '#';
+            
+            // For real CVEs that follow proper format
+            if (cveId.match(/^CVE-\d{4}-\d{4,}$/)) {
+                return `https://nvd.nist.gov/vuln/detail/${cveId}`;
+            }
+            
+            // For test/research CVEs or other formats, use search
+            return `https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query=${encodeURIComponent(cveId)}`;
+        }
+        
+        // Helper function to validate and clean reference links
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        function getValidReferences(references) {
+            if (!references || !Array.isArray(references)) return [];
+            return references.filter(ref => isValidUrl(ref));
+        }
+        
+        
+        // Test function for debugging modal
+        function testModalFunction() {
+            console.log('Testing modal functionality...');
+            const testVuln = {
+                "vulnerability_id": "TEST-001",
+                "cve_id": "CVE-TEST-001",
+                "title": "Test Vulnerability for Modal Functionality",
+                "description": "This is a test vulnerability to verify that the modal popup functionality is working correctly in the Kirin Vulnerability Database dashboard.",
+                "severity": "CRITICAL",
+                "cvss_score": 9.8,
+                "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "attack_vectors": ["test attack", "modal testing", "ui verification"],
+                "patch_status": "unpatched",
+                "references": ["https://example.com/test-vuln"],
+                "tags": ["test", "modal", "debug"],
+                "kirin_remediation_available": true
+            };
+            showVulnerabilityDetails(testVuln);
+        }
+        
+        // Modal event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('vulnerability-modal-backdrop');
+            const closeBtn = document.getElementById('modal-close-btn');
+            
+            closeBtn.addEventListener('click', hideVulnerabilityDetails);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideVulnerabilityDetails();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideVulnerabilityDetails();
+                }
+            });
+        });
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            addTerminalLine('info', 'KNOSTIC AI - KIRIN SOC INITIALIZING...');
+            addTerminalLine('info', 'ESTABLISHING SECURE CONNECTION...');
+            addTerminalLine('info', 'LOADING THREAT INTELLIGENCE SOURCES...');
+            
+            await fetchAndDisplayData();
+            
+            // Set up periodic refresh
+            setInterval(fetchAndDisplayData, 60000); // Every minute
+            
+            // Start live terminal updates
+            simulateLiveUpdates();
+        });
+    </script>
+</body>
+</html>

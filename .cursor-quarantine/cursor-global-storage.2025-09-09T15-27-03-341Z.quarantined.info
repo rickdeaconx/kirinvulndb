@@ -1,0 +1,18 @@
+{
+  "originalPath": "/Users/rickdeaconx/Library/Application Support/Cursor/User/globalStorage/state.vscdb#reactiveStorage",
+  "quarantineTime": 1757431623342,
+  "scanResult": {
+    "riskLevel": "medium",
+    "issues": [
+      {
+        "type": "malicious_command",
+        "severity": "medium",
+        "description": "Unable to scan configuration — remote scanner unavailable."
+      }
+    ],
+    "score": 50
+  },
+  "hasBackup": false,
+  "reason": "Cursor global storage contains security risks",
+  "isDatabaseContent": true
+}

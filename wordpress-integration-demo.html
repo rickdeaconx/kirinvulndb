@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Integration Demo - Kirin VulnDB</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .demo-title {
+            color: #333;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .shortcode-example {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .integration-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .integration-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+        .embed-demo {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Kirin Vulnerability Database - WordPress Integration</h1>
+    <p>Complete WordPress integration with multiple embedding options, API access, and real-time vulnerability monitoring.</p>
+
+    <div class="integration-grid">
+        <!-- API Integration -->
+        <div class="demo-section">
+            <h2 class="demo-title">🔌 API Integration</h2>
+            <p><strong>WordPress Plugin Features:</strong></p>
+            <ul class="feature-list">
+                <li>Authenticated API access with key management</li>
+                <li>CORS-enabled for WordPress domains</li>
+                <li>Cached responses for performance</li>
+                <li>Error handling and fallbacks</li>
+                <li>Auto-refresh capabilities</li>
+            </ul>
+            
+            <h3>Available Endpoints:</h3>
+            <div class="shortcode-example">
+                GET /api/wordpress/embed/vulnerabilities<br>
+                GET /api/wordpress/embed/stats<br>
+                GET /api/wordpress/embed/alerts
+            </div>
+        </div>
+
+        <!-- Shortcodes -->
+        <div class="demo-section">
+            <h2 class="demo-title">📝 WordPress Shortcodes</h2>
+            
+            <h3>Vulnerability Feed:</h3>
+            <div class="shortcode-example">
+                [kirin-vulnerabilities limit="5" severity="critical" theme="light"]
+            </div>
+            
+            <h3>Statistics Widget:</h3>
+            <div class="shortcode-example">
+                [kirin-stats theme="dark"]
+            </div>
+            
+            <h3>Security Alerts:</h3>
+            <div class="shortcode-example">
+                [kirin-alerts limit="3" theme="light"]
+            </div>
+            
+            <h3>Full Dashboard Embed:</h3>
+            <div class="shortcode-example">
+                [kirin-embed height="600" theme="light"]
+            </div>
+        </div>
+    </div>
+
+    <!-- Embeddable Dashboard Demo -->
+    <div class="demo-section">
+        <h2 class="demo-title">📊 Embeddable Dashboard</h2>
+        <p>Complete SOC-style dashboard that can be embedded via iframe:</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <iframe src="http://localhost:8080/embed.html?theme=light&limit=5&api_key=wp-demo-key" 
+                    width="100%" height="600" frameborder="0" 
+                    style="border: 1px solid #ddd; border-radius: 8px;"></iframe>
+        </div>
+        
+        <p><strong>Features:</strong></p>
+        <ul class="feature-list">
+            <li>Real-time vulnerability data</li>
+            <li>Statistics dashboard</li>
+            <li>Light and dark themes</li>
+            <li>Mobile responsive design</li>
+            <li>Auto-refresh every 5 minutes</li>
+            <li>Customizable via URL parameters</li>
+        </ul>
+    </div>
+
+    <!-- WordPress Plugin Features -->
+    <div class="demo-section">
+        <h2 class="demo-title">🔧 WordPress Plugin Capabilities</h2>
+        
+        <div class="integration-grid">
+            <div>
+                <h3>Display Options:</h3>
+                <ul class="feature-list">
+                    <li>Shortcodes for posts/pages</li>
+                    <li>Gutenberg blocks for visual editing</li>
+                    <li>Widgets for sidebars</li>
+                    <li>Full dashboard embedding</li>
+                    <li>Custom PHP integration</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Customization:</h3>
+                <ul class="feature-list">
+                    <li>Light and dark themes</li>
+                    <li>Severity filtering</li>
+                    <li>AI tool filtering</li>
+                    <li>Adjustable limits</li>
+                    <li>Custom CSS support</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Admin Configuration:</h3>
+        <ul class="feature-list">
+            <li>Settings page for API configuration</li>
+            <li>API key management</li>
+            <li>Endpoint customization</li>
+            <li>Theme selection</li>
+            <li>Performance settings</li>
+        </ul>
+    </div>
+
+    <!-- Installation Instructions -->
+    <div class="demo-section">
+        <h2 class="demo-title">📦 Installation & Setup</h2>
+        
+        <h3>Step 1: Install Plugin</h3>
+        <ol>
+            <li>Upload plugin folder to <code>/wp-content/plugins/kirin-vulnerability-dashboard/</code></li>
+            <li>Activate plugin in WordPress admin</li>
+            <li>Go to Settings > Kirin VulnDB</li>
+        </ol>
+        
+        <h3>Step 2: Configure API</h3>
+        <ol>
+            <li>Set API Endpoint: <code>http://your-server:8080/api</code></li>
+            <li>Set API Key: <code>wp-demo-key</code> (or your custom key)</li>
+            <li>Save settings</li>
+        </ol>
+        
+        <h3>Step 3: Use Shortcodes</h3>
+        <p>Add shortcodes to any post, page, or widget area:</p>
+        <div class="shortcode-example">
+            [kirin-vulnerabilities limit="10" theme="light"]
+        </div>
+    </div>
+
+    <!-- Integration Benefits -->
+    <div class="demo-section">
+        <h2 class="demo-title">🚀 Integration Benefits</h2>
+        
+        <div class="integration-grid">
+            <div>
+                <h3>For Security Teams:</h3>
+                <ul class="feature-list">
+                    <li>Public-facing vulnerability disclosure</li>
+                    <li>Real-time threat communication</li>
+                    <li>Automated security reporting</li>
+                    <li>Stakeholder transparency</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>For Development Teams:</h3>
+                <ul class="feature-list">
+                    <li>AI tool risk awareness</li>
+                    <li>Vulnerability tracking</li>
+                    <li>Patch status monitoring</li>
+                    <li>Tool-specific alerts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #666;">
+        <p><strong>Powered by Kirin Vulnerability Database</strong></p>
+        <p>Real-time AI security monitoring and WordPress integration</p>
+        <p><em>Copyright © 2025 Rick Deacon, Knostic AI - https://knostic.ai</em></p>
+    </footer>
+
+    <script>
+        // Auto-refresh demo every 30 seconds
+        setInterval(() => {
+            const iframe = document.querySelector('iframe');
+            if (iframe) {
+                iframe.src = iframe.src;
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
