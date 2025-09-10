@@ -12,6 +12,7 @@ The Kirin Vulnerability Database is a comprehensive security monitoring platform
 - ⚡ **Real-Time Monitoring**: WebSocket-based live updates with sub-second latency
 - 🤖 **AI-Powered Analysis**: Intelligent vulnerability classification and risk assessment
 - 🔧 **Automated Remediation**: Kirin plugin integration for automatic vulnerability fixes
+- 📡 **WordPress RSS Integration**: Auto-updating RSS feeds for seamless blog integration
 - 📊 **Rich Dashboard**: React-based monitoring interface with charts and analytics
 - 🔌 **Plugin Architecture**: Extensible system with Kirin Cursor plugin integration
 - 🚀 **High Performance**: Kafka-based streaming with Redis caching
@@ -116,6 +117,7 @@ After startup, you can access:
 - 🔧 **API Documentation**: http://localhost:8080/docs
 - 💾 **API Base**: http://localhost:8080/api
 - 🔌 **Kirin Plugin API**: http://localhost:8080/api/kirin
+- 📡 **RSS Feeds**: http://localhost:8080/api/rss/vulnerabilities.xml
 - ❤️ **Health Check**: http://localhost:8080/api/health
 - 📈 **Metrics**: http://localhost:9090 (Prometheus)
 - 📋 **Logs**: http://localhost:3001 (Grafana)
@@ -132,6 +134,14 @@ GET /api/vulnerabilities/by-tool/{tool_name}
 GET /api/vulnerabilities/search?q={query}
 GET /api/vulnerabilities/trending
 GET /api/vulnerabilities/stats
+```
+
+#### RSS Feeds API
+```http
+GET /api/rss/vulnerabilities.xml          # WordPress-compatible RSS feed
+GET /api/rss/vulnerabilities/latest       # Latest vulnerabilities RSS
+GET /api/rss/vulnerabilities/critical     # Critical vulnerabilities only
+GET /api/rss/vulnerabilities/cursor       # Cursor-specific vulnerabilities
 ```
 
 #### Tools API
@@ -257,6 +267,71 @@ The system actively monitors these AI coding assistants:
 - **Replit Ghostwriter** - AI pair programmer for Replit
 - **Sourcegraph Cody** - AI coding assistant
 - **JetBrains AI Assistant** - AI-powered coding for JetBrains IDEs
+
+## WordPress RSS Integration 📡
+
+The Kirin Vulnerability Database provides WordPress-ready RSS feeds that automatically update every 6 hours with the latest AI-related vulnerabilities. This enables seamless integration with WordPress blogs to display vulnerability posts.
+
+### RSS Feed Features
+
+- **📡 Auto-updating**: Fresh content every 6 hours from 33+ vulnerability sources
+- **🎯 AI-focused**: Strict filtering for AI coding tools and assistants only
+- **🔧 WordPress-ready**: Proper RSS 2.0 XML format with HTML content encoding
+- **⚡ Cursor-prioritized**: Cursor IDE vulnerabilities get top priority and enhanced visibility
+
+### Available RSS Endpoints
+
+```bash
+# Main WordPress feed (recommended for blogs)
+http://localhost:8080/api/rss/vulnerabilities.xml
+
+# Specialized feeds
+http://localhost:8080/api/rss/vulnerabilities/latest    # Most recent discoveries  
+http://localhost:8080/api/rss/vulnerabilities/critical  # CRITICAL/HIGH severity only
+http://localhost:8080/api/rss/vulnerabilities/cursor    # Cursor-specific vulnerabilities
+```
+
+### WordPress Integration Steps
+
+1. **Add RSS Feed to WordPress**:
+   ```
+   WP Admin → Posts → RSS Importer → Add Feed
+   URL: http://your-server:8080/api/rss/vulnerabilities.xml
+   Update Frequency: Every 6 hours
+   ```
+
+2. **RSS Feed Content Structure**:
+   - **Title**: `[CRITICAL] CVE-2025-12345 - Cursor IDE Remote Code Execution`
+   - **Description**: AI-analyzed vulnerability summary with CVSS scoring
+   - **Content**: Full HTML with severity, affected tools, remediation steps
+   - **Categories**: Auto-tagged with tool names (cursor, copilot, etc.)
+   - **Published Date**: Discovery timestamp
+
+3. **Sample WordPress Post Output**:
+   ```html
+   <h3>🚨 CRITICAL Vulnerability: CVE-2025-12345</h3>
+   <p><strong>Affected Tool:</strong> Cursor IDE v0.8.3</p>
+   <p><strong>CVSS Score:</strong> 9.1 (Critical)</p>
+   <p><strong>Attack Vector:</strong> Remote Code Execution via malicious extensions</p>
+   
+   <h4>📋 Summary</h4>
+   <p>AI-analyzed vulnerability allowing remote code execution through crafted extension manifests...</p>
+   
+   <h4>🔧 Remediation</h4>
+   <ul>
+     <li>Update Cursor to version 0.8.4+</li>
+     <li>Review installed extensions</li>
+     <li>Enable extension signature verification</li>
+   </ul>
+   ```
+
+### RSS Content Quality
+
+- **AI-Enhanced Descriptions**: Each vulnerability analyzed by our AI system for better readability
+- **Severity Classification**: CRITICAL/HIGH/MEDIUM/LOW with color-coded indicators
+- **Actionable Remediation**: Specific steps for vulnerability mitigation
+- **Tool Context**: Clear identification of affected AI coding assistants
+- **Update Frequency**: 6-hour intervals ensure fresh, actionable content
 
 ## Development
 
