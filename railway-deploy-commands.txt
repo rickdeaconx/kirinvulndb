@@ -6,13 +6,13 @@ railway login
 # Step 2: Initialize project  
 railway init
 
-# Step 3: Set environment variables (NEW SYNTAX)
-railway variables DATABASE_URL="sqlite:///./kirinvulndb.db"
-railway variables NVD_API_KEY="d9b1e4b4-649a-4fac-93e5-fe808def98ec"
-railway variables LOG_LEVEL="INFO" 
-railway variables CVE_COLLECTION_INTERVAL="21600"
-railway variables VENDOR_COLLECTION_INTERVAL="43200"
-railway variables COMMUNITY_COLLECTION_INTERVAL="86400"
+# Step 3: Set environment variables (NEW SYNTAX) 
+railway variables set DATABASE_URL="sqlite:///./kirinvulndb.db"
+railway variables set NVD_API_KEY="d9b1e4b4-649a-4fac-93e5-fe808def98ec"
+railway variables set LOG_LEVEL="INFO" 
+railway variables set CVE_COLLECTION_INTERVAL="21600"
+railway variables set VENDOR_COLLECTION_INTERVAL="43200"
+railway variables set COMMUNITY_COLLECTION_INTERVAL="86400"
 
 # Alternative method - use Railway dashboard:
 # Go to railway.app → Your Project → Variables tab → Add manually

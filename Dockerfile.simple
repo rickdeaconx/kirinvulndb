@@ -21,6 +21,9 @@ RUN mkdir -p logs
 # Create simple startup script
 RUN echo '#!/bin/bash\n\
 set -e\n\
+# Force SQLite mode for Railway deployment\n\
+export DATABASE_URL="${DATABASE_URL:-sqlite:///./kirinvulndb.db}"\n\
+export RAILWAY_ENVIRONMENT="production"\n\
 echo "🛡️  Starting Kirin Vulnerability Database - Railway Deployment"\n\
 echo "Environment: Production"\n\
 echo "Port: ${PORT:-8080}"\n\
@@ -36,7 +39,8 @@ echo ""\n\
 echo "🔧 Testing SQLite compatibility..."\n\
 python3 -c "\n\
 import os\n\
-os.environ[\"DATABASE_URL\"] = \"sqlite:///./kirinvulndb.db\"\n\
+os.environ[\"DATABASE_URL\"] = \"${DATABASE_URL}\"\n\
+os.environ[\"RAILWAY_ENVIRONMENT\"] = \"production\"\n\
 from app.models.base import Base, UUID_TYPE\n\
 print(f\"UUID_TYPE: {UUID_TYPE}\")\n\
 from sqlalchemy import create_engine\n\
