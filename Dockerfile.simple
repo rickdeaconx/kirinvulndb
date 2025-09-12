@@ -1,0 +1,49 @@
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc g++ libpq-dev curl wget ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project
+COPY . .
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Create simple startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "🛡️  Starting Kirin Vulnerability Database - Railway Deployment"\n\
+echo "Environment: Production"\n\
+echo "Port: ${PORT:-8080}"\n\
+echo "Database: SQLite (embedded)"\n\
+echo ""\n\
+echo "Setting up database..."\n\
+python scripts/init_db.py || echo "Database already initialized"\n\
+echo ""\n\
+echo "Starting vulnerability monitoring API..."\n\
+echo "🔗 RSS Feed will be available at: /api/rss/vulnerabilities.xml"\n\
+echo "📊 API Docs at: /docs"\n\
+echo "❤️  Health check at: /api/health"\n\
+echo ""\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1\n' > start.sh
+
+RUN chmod +x start.sh
+
+# Expose port
+EXPOSE $PORT
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:$PORT/api/health || exit 1
+
+# Start application
+CMD ["./start.sh"]

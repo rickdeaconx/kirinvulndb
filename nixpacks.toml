@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ['...', 'gcc', 'pkg-config']
+
+[phases.install]
+dependsOn = ['setup']
+
+[phases.build]
+dependsOn = ['install']
+
+[start]
+cmd = './start.sh'

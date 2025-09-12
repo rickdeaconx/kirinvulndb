@@ -50,7 +50,26 @@ graph TB
 
 ## Quick Start
 
-### Option 1: Automated Setup (Recommended)
+### Option 1: Deploy to Railway (1-Click Deploy) ⚡
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/KirinVulnDB)
+
+**OR** use the automated deploy script:
+```bash
+# Clone and deploy in one command
+git clone https://github.com/rickdeaconx/kirinvulndb.git
+cd kirinvulndb
+./scripts/railway_deploy.sh
+```
+
+**What you get:**
+- 🆓 **Free hosting** on Railway (500 hours/month)
+- 📡 **WordPress RSS feed** at `/api/rss/vulnerabilities.xml`
+- 🔗 **API docs** at `/docs`
+- 🛡️ **Real-time vulnerability monitoring** (6-hour intervals)
+- 💾 **SQLite database** (no setup required)
+
+### Option 2: Automated Setup (Local Development)
 
 ```bash
 # Clone the repository

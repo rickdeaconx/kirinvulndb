@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: kirin-vulndb
+    env: docker
+    dockerfilePath: ./Dockerfile.simple
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./kirinvulndb.db
+      - key: API_SECRET_KEY
+        generateValue: true
+      - key: NVD_API_KEY
+        value: d9b1e4b4-649a-4fac-93e5-fe808def98ec
+      - key: LOG_LEVEL
+        value: INFO
+      - key: REDIS_URL
+        value: redis://localhost:6379
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: kirin-postgres
+    databaseName: kirinvulndb
+    user: kirinuser
+    plan: free

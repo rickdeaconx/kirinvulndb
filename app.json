@@ -1,0 +1,37 @@
+{
+  "name": "Kirin Vulnerability Database",
+  "description": "Real-time AI coding assistant vulnerability monitoring with WordPress RSS integration",
+  "repository": "https://github.com/rickdeaconx/kirinvulndb",
+  "logo": "https://raw.githubusercontent.com/rickdeaconx/kirinvulndb/main/static/kirin-logo.png",
+  "keywords": ["vulnerability", "security", "ai", "cursor", "copilot", "rss", "wordpress"],
+  "stack": "container",
+  "env": {
+    "DATABASE_URL": {
+      "description": "SQLite database will be used by default",
+      "value": "sqlite:///./kirinvulndb.db"
+    },
+    "API_SECRET_KEY": {
+      "description": "Secret key for API authentication",
+      "generator": "secret"
+    },
+    "NVD_API_KEY": {
+      "description": "NIST NVD API key for vulnerability data",
+      "value": "d9b1e4b4-649a-4fac-93e5-fe808def98ec"
+    },
+    "GITHUB_TOKEN": {
+      "description": "GitHub token for Security Advisories (optional)",
+      "required": false
+    },
+    "LOG_LEVEL": {
+      "description": "Logging level",
+      "value": "INFO"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": []
+}
