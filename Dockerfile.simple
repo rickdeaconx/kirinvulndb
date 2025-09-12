@@ -25,9 +25,28 @@ echo "🛡️  Starting Kirin Vulnerability Database - Railway Deployment"\n\
 echo "Environment: Production"\n\
 echo "Port: ${PORT:-8080}"\n\
 echo "Database: SQLite (embedded)"\n\
+echo "Database URL: ${DATABASE_URL}"\n\
 echo ""\n\
-echo "Setting up database..."\n\
-python scripts/init_db.py || echo "Database already initialized"\n\
+# Test Python environment\n\
+echo "🔧 Testing Python environment..."\n\
+python3 -c "import sys; print(f\"Python: {sys.version}\")" || exit 1\n\
+python3 -c "import sqlalchemy; print(f\"SQLAlchemy: {sqlalchemy.__version__}\")" || exit 1\n\
+echo ""\n\
+# Test SQLite compatibility\n\
+echo "🔧 Testing SQLite compatibility..."\n\
+python3 -c "\n\
+import os\n\
+os.environ[\"DATABASE_URL\"] = \"sqlite:///./kirinvulndb.db\"\n\
+from app.models.base import Base, UUID_TYPE\n\
+print(f\"UUID_TYPE: {UUID_TYPE}\")\n\
+from sqlalchemy import create_engine\n\
+engine = create_engine(\"sqlite:///./test_compatibility.db\")\n\
+Base.metadata.create_all(bind=engine)\n\
+print(\"✅ SQLite compatibility verified\")\n\
+" || exit 1\n\
+echo ""\n\
+echo "Setting up production database..."\n\
+python3 scripts/init_db.py || echo "Database initialization handled"\n\
 echo ""\n\
 echo "Starting vulnerability monitoring API..."\n\
 echo "🔗 RSS Feed will be available at: /api/rss/vulnerabilities.xml"\n\

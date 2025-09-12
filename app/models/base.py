@@ -33,3 +33,6 @@ class Base(DeclarativeBase):
     id = Column(UUID_TYPE, primary_key=True, default=UUID_DEFAULT)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+# Export UUID_TYPE for other models
+__all__ = ['Base', 'UUID_TYPE', 'UUID_DEFAULT']

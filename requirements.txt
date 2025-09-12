@@ -24,6 +24,7 @@ aiokafka==0.10.0
 # HTTP clients and web scraping
 httpx==0.25.2
 requests==2.31.0
+aiohttp==3.9.1
 beautifulsoup4==4.12.2
 feedparser==6.0.10
 lxml==4.9.3
