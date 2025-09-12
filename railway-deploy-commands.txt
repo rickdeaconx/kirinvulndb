@@ -1,0 +1,31 @@
+# 🚂 Railway CLI Deployment Commands (Updated Syntax)
+
+# Step 1: Login to Railway
+railway login
+
+# Step 2: Initialize project  
+railway init
+
+# Step 3: Set environment variables (NEW SYNTAX)
+railway variables DATABASE_URL="sqlite:///./kirinvulndb.db"
+railway variables NVD_API_KEY="d9b1e4b4-649a-4fac-93e5-fe808def98ec"
+railway variables LOG_LEVEL="INFO" 
+railway variables CVE_COLLECTION_INTERVAL="21600"
+railway variables VENDOR_COLLECTION_INTERVAL="43200"
+railway variables COMMUNITY_COLLECTION_INTERVAL="86400"
+
+# Alternative method - use Railway dashboard:
+# Go to railway.app → Your Project → Variables tab → Add manually
+
+# Step 4: Deploy
+railway up
+
+# Step 5: Check status
+railway status
+
+# Step 6: Get URL
+railway dashboard
+
+# Troubleshooting commands:
+railway logs          # View deployment logs
+railway redeploy      # Redeploy if needed

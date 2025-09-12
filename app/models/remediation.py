@@ -1,7 +1,6 @@
 from sqlalchemy import Column, String, Text, Boolean, JSON, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID
-from .base import Base
+from .base import Base, UUID_TYPE
 import enum
 
 
@@ -26,7 +25,7 @@ class Remediation(Base):
     __tablename__ = "remediation"
     
     # Foreign key to vulnerability
-    vulnerability_id = Column(UUID(as_uuid=True), ForeignKey('vulnerability.id'), nullable=False)
+    vulnerability_id = Column(UUID_TYPE, ForeignKey('vulnerability.id'), nullable=False)
     
     # Remediation details
     remediation_type = Column(Enum(RemediationTypeEnum), nullable=False)

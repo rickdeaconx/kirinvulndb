@@ -1,7 +1,6 @@
 from sqlalchemy import Column, String, Text, Boolean, DateTime, Enum, ForeignKey, JSON
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID
-from .base import Base
+from .base import Base, UUID_TYPE
 import enum
 from datetime import datetime
 
@@ -35,7 +34,7 @@ class Alert(Base):
     __tablename__ = "alert"
     
     # Foreign key to vulnerability
-    vulnerability_id = Column(UUID(as_uuid=True), ForeignKey('vulnerability.id'), nullable=False)
+    vulnerability_id = Column(UUID_TYPE, ForeignKey('vulnerability.id'), nullable=False)
     
     # Alert details
     alert_type = Column(Enum(AlertTypeEnum), nullable=False)

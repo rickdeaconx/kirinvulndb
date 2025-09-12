@@ -2,14 +2,25 @@ from sqlalchemy import Column, DateTime, func, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import DeclarativeBase
 import uuid
+import os
 
-try:
-    from sqlalchemy.dialects.postgresql import UUID
-    UUID_TYPE = UUID(as_uuid=True)
-    UUID_DEFAULT = uuid.uuid4
-except ImportError:
+# Force String UUID for SQLite compatibility in deployment
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+USE_SQLITE = "sqlite" in DATABASE_URL.lower()
+
+if USE_SQLITE:
+    # SQLite-compatible UUID
     UUID_TYPE = String(36)
     UUID_DEFAULT = lambda: str(uuid.uuid4())
+else:
+    # PostgreSQL UUID for full features
+    try:
+        from sqlalchemy.dialects.postgresql import UUID
+        UUID_TYPE = UUID(as_uuid=True)
+        UUID_DEFAULT = uuid.uuid4
+    except ImportError:
+        UUID_TYPE = String(36)
+        UUID_DEFAULT = lambda: str(uuid.uuid4())
 
 
 class Base(DeclarativeBase):
