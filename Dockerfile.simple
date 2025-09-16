@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
+# Ensure seed data file is available
+COPY seed_data.sql /app/seed_data.sql
+
 # Create logs directory
 RUN mkdir -p logs
 
@@ -57,16 +60,18 @@ echo "🔗 RSS Feed will be available at: /api/rss/vulnerabilities.xml"\n\
 echo "📊 API Docs at: /docs"\n\
 echo "❤️  Health check at: /api/health"\n\
 echo ""\n\
-exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1\n' > start.sh
+echo "Starting web server..."\n\
+echo "🔧 Initial vulnerability scan will begin after server startup"\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1 --timeout-keep-alive 60\n' > start.sh
 
 RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8080}/api/health || exit 1
+# Health check - Extended for Railway deployment
+HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=5 \
+    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
 
 # Start application
 CMD ["./start.sh"]

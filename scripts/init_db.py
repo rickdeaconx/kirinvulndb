@@ -16,6 +16,8 @@ from app.models.vulnerability import Vulnerability, SeverityEnum, PatchStatusEnu
 from app.core.config import settings
 from datetime import datetime
 import logging
+import sqlite3
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,8 +30,56 @@ def create_tables():
     logger.info("Database tables created successfully")
 
 
+def load_seed_data():
+    """Load seed data from SQL dump if database is empty"""
+    try:
+        # Check if we have historical data already
+        with SessionLocal() as db:
+            vuln_count = db.query(Vulnerability).count()
+            if vuln_count > 2:  # More than sample data
+                logger.info(f"Database already has {vuln_count} vulnerabilities, skipping seed data")
+                return
+        
+        # Check if seed data file exists
+        seed_file = "/app/seed_data.sql"
+        if not os.path.exists(seed_file):
+            seed_file = "seed_data.sql"  # Try local path
+            
+        if os.path.exists(seed_file):
+            logger.info("Loading historical vulnerability data from seed file...")
+            
+            # Get database URL from settings
+            db_url = str(engine.url)
+            if db_url.startswith("sqlite:///"):
+                db_path = db_url.replace("sqlite:///", "")
+                
+                # Load seed data into SQLite
+                conn = sqlite3.connect(db_path)
+                with open(seed_file, 'r') as f:
+                    conn.executescript(f.read())
+                conn.close()
+                
+                logger.info("Historical vulnerability data loaded successfully!")
+            else:
+                logger.info("Non-SQLite database, skipping seed data import")
+        else:
+            logger.info("No seed data file found, creating sample data only")
+            
+    except Exception as e:
+        logger.error(f"Failed to load seed data: {e}")
+        logger.info("Continuing with sample data creation...")
+
+
 def populate_initial_tools():
     """Populate initial AI tools data"""
+    
+    with SessionLocal() as db:
+        # Check if tools already exist (for Railway pre-populated database)
+        existing_count = db.query(AITool).count()
+        if existing_count > 0:
+            logger.info(f"AI tools already populated ({existing_count} tools found)")
+            return
+    
     logger.info("Populating initial AI tools...")
     
     tools_data = [
@@ -152,6 +202,14 @@ def populate_initial_tools():
 
 def create_sample_vulnerabilities():
     """Create some sample vulnerabilities for testing"""
+    
+    with SessionLocal() as db:
+        # Check if vulnerabilities already exist (for Railway pre-populated database)
+        existing_count = db.query(Vulnerability).count()
+        if existing_count > 2:  # More than just sample data
+            logger.info(f"Vulnerabilities already populated ({existing_count} vulnerabilities found)")
+            return
+    
     logger.info("Creating sample vulnerabilities...")
     
     sample_vulns = [
@@ -220,10 +278,13 @@ def main():
         # Create tables
         create_tables()
         
-        # Populate initial data
+        # Try to load historical data first
+        load_seed_data()
+        
+        # Populate initial data (only if not already present)
         populate_initial_tools()
         
-        # Create sample vulnerabilities for testing
+        # Create sample vulnerabilities for testing (only if no historical data)
         create_sample_vulnerabilities()
         
         logger.info("Database initialization completed successfully!")

@@ -5,13 +5,13 @@ dockerfilePath = "Dockerfile.simple"
 [deploy]
 startCommand = "./start.sh"
 restartPolicyType = "always"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 300
+healthcheckPath = "/health"
+healthcheckTimeout = 600
 
 [environments.production.variables]
 PORT = "8080"
 DATABASE_URL = "sqlite:///./kirinvulndb.db"
-NVD_API_KEY = "d9b1e4b4-649a-4fac-93e5-fe808def98ec"
+NVD_API_KEY = "05c32e35-bd2c-4b72-bfb6-1fb0ac7fe0b4"
 REDIS_URL = "redis://localhost:6379"
 LOG_LEVEL = "INFO"
 CVE_COLLECTION_INTERVAL = "21600"
