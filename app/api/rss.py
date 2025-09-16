@@ -18,6 +18,7 @@ import logging
 from app.db.database import get_db
 from app.models.vulnerability import Vulnerability
 from app.models.tool import AITool
+from app.services.llm_enhancer import llm_enhancer
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -28,13 +29,36 @@ def format_rss_date(dt: datetime) -> str:
     return dt.strftime('%a, %d %b %Y %H:%M:%S %z') or dt.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
 
-def create_vulnerability_description(vuln: Vulnerability) -> str:
-    """Create detailed description for RSS feed"""
+async def create_vulnerability_description(vuln: Vulnerability) -> str:
+    """Create LLM-enhanced blog-style description for RSS feed"""
+    try:
+        # Get LLM-enhanced content
+        enhanced_content = await llm_enhancer.enhance_vulnerability(vuln)
+        
+        if enhanced_content.get("blog_format"):
+            # Return the enhanced blog-style description
+            blog_content = enhanced_content["enhanced_description"]
+            
+            # Add Knostic Kirin footer
+            blog_content += f"""
+<hr>
+<p><em>🛡️ This vulnerability intelligence is powered by <strong>Knostic Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>📊 Confidence Score: {vuln.confidence_score}/1.0 | 🔍 Source: {vuln.source}</em></p>
+<p><em>🏷️ ID: {vuln.vulnerability_id} | 📅 Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>
+"""
+            return blog_content
+    
+    except Exception as e:
+        logger.error(f"LLM enhancement failed for {vuln.vulnerability_id}: {e}")
+        # Fall back to original format
+    
+    # Fallback to original format if LLM fails
     description_parts = [
+        f"<h2>🛡️ Kirin Security Alert</h2>",
         f"<p><strong>CVE ID:</strong> {vuln.cve_id or 'N/A'}</p>",
         f"<p><strong>Severity:</strong> {vuln.severity.value} (CVSS: {vuln.cvss_score or 'N/A'})</p>",
         f"<p><strong>Patch Status:</strong> {vuln.patch_status.value}</p>",
-        f"<p><strong>Description:</strong></p>",
+        f"<h3>Description</h3>",
         f"<p>{html.escape(vuln.description)}</p>"
     ]
     
@@ -43,19 +67,25 @@ def create_vulnerability_description(vuln: Vulnerability) -> str:
         description_parts.append(f"<p><strong>Attack Vectors:</strong> {vectors}</p>")
     
     if vuln.technical_details:
-        description_parts.append(f"<p><strong>Technical Details:</strong></p>")
+        description_parts.append(f"<h3>Technical Details</h3>")
         description_parts.append(f"<p>{html.escape(vuln.technical_details)}</p>")
     
     if vuln.affected_tools:
-        tools = [tool.name for tool in vuln.affected_tools]
-        description_parts.append(f"<p><strong>Affected AI Tools:</strong> {', '.join(tools)}</p>")
+        tools = [tool.display_name for tool in vuln.affected_tools]
+        description_parts.append(f"<h3>Affected AI Tools</h3>")
+        description_parts.append(f"<p>{', '.join(tools)}</p>")
     
     if vuln.references:
-        description_parts.append(f"<p><strong>References:</strong></p>")
+        description_parts.append(f"<h3>References</h3>")
         description_parts.append("<ul>")
         for ref in vuln.references:
-            description_parts.append(f"<li><a href='{ref}' target='_blank'>{ref}</a></li>")
+            ref_text = ref.title if hasattr(ref, 'title') else str(ref)
+            ref_url = ref.url if hasattr(ref, 'url') else str(ref)
+            description_parts.append(f"<li><a href='{ref_url}' target='_blank'>{ref_text}</a></li>")
         description_parts.append("</ul>")
+    
+    description_parts.append(f"<hr>")
+    description_parts.append(f"<p><em>🛡️ Powered by Knostic Kirin - AI Security Intelligence Platform</em></p>")
     
     return "".join(description_parts)
 
@@ -150,20 +180,27 @@ async def vulnerability_rss_feed(
     ET.SubElement(channel, "generator").text = "Kirin VulnDB by Knostic AI"
     ET.SubElement(channel, "lastBuildDate").text = format_rss_date(datetime.utcnow())
     
-    # Add items
+    # Add items with LLM enhancement
     for vuln in vulnerabilities:
         item = ET.SubElement(channel, "item")
         
-        # Title: CVE + Tool names
-        tool_names = [tool.name for tool in vuln.affected_tools] if vuln.affected_tools else ["AI Tools"]
-        title = f"{vuln.cve_id or vuln.vulnerability_id}: {vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
+        # Enhanced Title using LLM
+        try:
+            enhanced_content = await llm_enhancer.enhance_vulnerability(vuln)
+            title = enhanced_content.get("enhanced_title", f"🛡️ Kirin Alert: {vuln.title}")
+        except Exception as e:
+            logger.error(f"Failed to enhance title for {vuln.vulnerability_id}: {e}")
+            # Fallback title
+            tool_names = [tool.display_name for tool in vuln.affected_tools] if vuln.affected_tools else ["AI Tools"]
+            title = f"🛡️ Kirin Alert: {vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
+        
         ET.SubElement(item, "title").text = title
         
         # Link (could point to detailed view)
         ET.SubElement(item, "link").text = f"https://knostic.ai/vulnerability/{vuln.vulnerability_id}"
         
-        # Description (HTML content for WordPress)
-        description = create_vulnerability_description(vuln)
+        # Description (LLM-enhanced blog content for WordPress)
+        description = await create_vulnerability_description(vuln)
         ET.SubElement(item, "description").text = description
         
         # Content (full HTML content)

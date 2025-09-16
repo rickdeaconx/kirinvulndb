@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     NVD_BASE_URL: str = "https://services.nvd.nist.gov/rest/json"
     SHODAN_API_KEY: Optional[str] = None
     GITHUB_TOKEN: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
     
     # Rate limiting
     RATE_LIMIT_PER_MINUTE: int = 60
@@ -115,6 +116,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
         
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
