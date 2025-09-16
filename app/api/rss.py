@@ -42,7 +42,7 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
             # Add Knostic Kirin footer
             blog_content += f"""
 <hr>
-<p><em>🛡️ This vulnerability intelligence is powered by <strong>Knostic Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>This vulnerability intelligence is powered by <strong>Knostic Kirin</strong> - Advanced AI Security Monitoring</em></p>
 <p><em>📊 Confidence Score: {vuln.confidence_score}/1.0 | 🔍 Source: {vuln.source}</em></p>
 <p><em>🏷️ ID: {vuln.vulnerability_id} | 📅 Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>
 """
@@ -54,7 +54,7 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
     
     # Fallback to original format if LLM fails
     description_parts = [
-        f"<h2>🛡️ Kirin Security Alert</h2>",
+        f"<h2>Kirin Security Alert</h2>",
         f"<p><strong>CVE ID:</strong> {vuln.cve_id or 'N/A'}</p>",
         f"<p><strong>Severity:</strong> {vuln.severity.value} (CVSS: {vuln.cvss_score or 'N/A'})</p>",
         f"<p><strong>Patch Status:</strong> {vuln.patch_status.value}</p>",
@@ -85,7 +85,7 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
         description_parts.append("</ul>")
     
     description_parts.append(f"<hr>")
-    description_parts.append(f"<p><em>🛡️ Powered by Knostic Kirin - AI Security Intelligence Platform</em></p>")
+    description_parts.append(f"<p><em>Powered by Knostic Kirin - AI Security Intelligence Platform</em></p>")
     
     return "".join(description_parts)
 
@@ -187,12 +187,12 @@ async def vulnerability_rss_feed(
         # Enhanced Title using LLM
         try:
             enhanced_content = await llm_enhancer.enhance_vulnerability(vuln)
-            title = enhanced_content.get("enhanced_title", f"🛡️ Kirin Alert: {vuln.title}")
+            title = enhanced_content.get("enhanced_title", f"Kirin Alert: {vuln.title}")
         except Exception as e:
             logger.error(f"Failed to enhance title for {vuln.vulnerability_id}: {e}")
             # Fallback title
             tool_names = [tool.display_name for tool in vuln.affected_tools] if vuln.affected_tools else ["AI Tools"]
-            title = f"🛡️ Kirin Alert: {vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
+            title = f"Kirin Alert: {vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
         
         ET.SubElement(item, "title").text = title
         
@@ -350,7 +350,7 @@ async def cursor_vulnerability_rss_feed(
         
         # Add Kirin plugin remediation info
         if vuln.kirin_remediation_available:
-            description_parts.append(f"<h4>🛡️ Kirin Plugin Remediation Available</h4>")
+            description_parts.append(f"<h4>Kirin Plugin Remediation Available</h4>")
             description_parts.append(f"<p>This vulnerability can be automatically remediated using the Kirin security plugin for Cursor IDE.</p>")
         
         if vuln.references:

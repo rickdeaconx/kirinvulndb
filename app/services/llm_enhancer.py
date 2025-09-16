@@ -113,6 +113,7 @@ Guidelines:
 - Keep technical details accessible but thorough
 - Emphasize actionable guidance
 - Use proper markdown formatting for blog readability
+- DO NOT use any emojis in the content
 
 VULNERABILITY DATA:
 {vuln_context}
@@ -136,7 +137,7 @@ Generate the enhanced blog content:
             # Parse the enhanced content into structured format
             first_line = enhanced_content.split('\n')[0].replace('#', '').strip()
             return {
-                "enhanced_title": f"🛡️ Kirin Alert: {first_line}",
+                "enhanced_title": f"Kirin Alert: {first_line}",
                 "enhanced_description": enhanced_content,
                 "blog_format": True,
                 "enhanced_by_llm": True,
@@ -156,7 +157,7 @@ Generate the enhanced blog content:
             tools = [tool.display_name for tool in vuln.affected_tools]
             affected_tools_text = f" affecting {', '.join(tools)}"
         
-        enhanced_title = f"🛡️ Kirin Alert: {vuln.title}"
+        enhanced_title = f"Kirin Alert: {vuln.title}"
         
         enhanced_desc = f"""
 ## Executive Summary
