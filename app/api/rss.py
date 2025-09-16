@@ -1,7 +1,7 @@
 """
 RSS Feed API for WordPress Integration
 Provides vulnerability data as RSS feeds for blog consumption
-Copyright © 2025 Rick Deacon, Knostic AI - https://knostic.ai
+Copyright © 2025 Rick Deacon, Kirin - https://www.getkirin.com
 """
 
 from fastapi import APIRouter, Depends, Query, HTTPException
@@ -172,12 +172,12 @@ async def vulnerability_rss_feed(
     
     # Channel metadata
     ET.SubElement(channel, "title").text = "Kirin Vulnerability Database - Cursor AI Security Feed"
-    ET.SubElement(channel, "link").text = "https://knostic.ai"
+    ET.SubElement(channel, "link").text = "https://www.getkirin.com"
     ET.SubElement(channel, "description").text = "Latest Cursor IDE and AI tool vulnerabilities from Kirin VulnDB - Prioritizing Cursor security"
     ET.SubElement(channel, "language").text = "en-us"
-    ET.SubElement(channel, "managingEditor").text = "rick@knostic.ai (Rick Deacon)"
-    ET.SubElement(channel, "webMaster").text = "rick@knostic.ai (Rick Deacon)"
-    ET.SubElement(channel, "generator").text = "Kirin VulnDB by Knostic AI"
+    ET.SubElement(channel, "managingEditor").text = "rick@getkirin.com (Rick Deacon)"
+    ET.SubElement(channel, "webMaster").text = "rick@getkirin.com (Rick Deacon)"
+    ET.SubElement(channel, "generator").text = "Kirin VulnDB"
     ET.SubElement(channel, "lastBuildDate").text = format_rss_date(datetime.utcnow())
     
     # Add items with LLM enhancement
@@ -197,7 +197,7 @@ async def vulnerability_rss_feed(
         ET.SubElement(item, "title").text = title
         
         # Link (could point to detailed view)
-        ET.SubElement(item, "link").text = f"https://knostic.ai/vulnerability/{vuln.vulnerability_id}"
+        ET.SubElement(item, "link").text = f"https://www.getkirin.com/vulnerability/{vuln.vulnerability_id}"
         
         # Description (LLM-enhanced blog content for WordPress)
         description = await create_vulnerability_description(vuln)
@@ -311,12 +311,12 @@ async def cursor_vulnerability_rss_feed(
     
     # Channel metadata
     ET.SubElement(channel, "title").text = "Cursor IDE Security Vulnerabilities - Kirin VulnDB"
-    ET.SubElement(channel, "link").text = "https://knostic.ai/cursor-security"
+    ET.SubElement(channel, "link").text = "https://www.getkirin.com/cursor-security"
     ET.SubElement(channel, "description").text = "Latest security vulnerabilities affecting Cursor IDE - AI-powered code editor security alerts"
     ET.SubElement(channel, "language").text = "en-us"
-    ET.SubElement(channel, "managingEditor").text = "rick@knostic.ai (Rick Deacon)"
-    ET.SubElement(channel, "webMaster").text = "rick@knostic.ai (Rick Deacon)"
-    ET.SubElement(channel, "generator").text = "Kirin VulnDB by Knostic AI"
+    ET.SubElement(channel, "managingEditor").text = "rick@getkirin.com (Rick Deacon)"
+    ET.SubElement(channel, "webMaster").text = "rick@getkirin.com (Rick Deacon)"
+    ET.SubElement(channel, "generator").text = "Kirin VulnDB"
     ET.SubElement(channel, "lastBuildDate").text = format_rss_date(datetime.utcnow())
     
     # Add items
@@ -328,7 +328,7 @@ async def cursor_vulnerability_rss_feed(
         ET.SubElement(item, "title").text = title
         
         # Link
-        ET.SubElement(item, "link").text = f"https://knostic.ai/cursor-vulnerability/{vuln.vulnerability_id}"
+        ET.SubElement(item, "link").text = f"https://www.getkirin.com/cursor-vulnerability/{vuln.vulnerability_id}"
         
         # Enhanced description for Cursor
         description_parts = [
@@ -361,7 +361,7 @@ async def cursor_vulnerability_rss_feed(
             description_parts.append("</ul>")
         
         description_parts.append(f"<hr>")
-        description_parts.append(f"<p><em>Powered by <a href='https://knostic.ai'>Knostic AI</a> - Kirin Vulnerability Database</em></p>")
+        description_parts.append(f"<p><em>Powered by <a href='https://www.getkirin.com'>Kirin</a> - Kirin Vulnerability Database</em></p>")
         
         description = "".join(description_parts)
         ET.SubElement(item, "description").text = description
@@ -442,5 +442,5 @@ async def rss_feed_info():
                 "SEO-friendly titles"
             ]
         },
-        "powered_by": "Knostic AI - https://knostic.ai"
+        "powered_by": "Kirin - https://www.getkirin.com"
     }
