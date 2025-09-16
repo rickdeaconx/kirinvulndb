@@ -39,12 +39,12 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
             # Return the enhanced blog-style description
             blog_content = enhanced_content["enhanced_description"]
             
-            # Add Knostic Kirin footer
+            # Add Kirin footer
             blog_content += f"""
 <hr>
-<p><em>This vulnerability intelligence is powered by <strong>Knostic Kirin</strong> - Advanced AI Security Monitoring</em></p>
-<p><em>📊 Confidence Score: {vuln.confidence_score}/1.0 | 🔍 Source: {vuln.source}</em></p>
-<p><em>🏷️ ID: {vuln.vulnerability_id} | 📅 Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>
+<p><em>This vulnerability intelligence is powered by <strong>Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>Confidence Score: {vuln.confidence_score}/1.0 | Source: {vuln.source}</em></p>
+<p><em>ID: {vuln.vulnerability_id} | Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>
 """
             return blog_content
     
@@ -201,6 +201,8 @@ async def vulnerability_rss_feed(
         
         # Description (LLM-enhanced blog content for WordPress)
         description = await create_vulnerability_description(vuln)
+        
+        # Set HTML content directly without escaping
         ET.SubElement(item, "description").text = description
         
         # Content (full HTML content)
@@ -232,12 +234,9 @@ async def vulnerability_rss_feed(
     
     # Convert to string with pretty printing
     rough_string = ET.tostring(rss, 'unicode')
-    reparsed = minidom.parseString(rough_string)
-    pretty_xml = reparsed.toprettyxml(indent="  ", encoding=None)
     
-    # Remove empty lines
-    lines = [line for line in pretty_xml.split('\n') if line.strip()]
-    final_xml = '\n'.join(lines)
+    # Simple pretty printing without reparsing
+    final_xml = rough_string
     
     return Response(
         content=final_xml,
@@ -364,6 +363,8 @@ async def cursor_vulnerability_rss_feed(
         description_parts.append(f"<p><em>Powered by <a href='https://www.getkirin.com'>Kirin</a> - Kirin Vulnerability Database</em></p>")
         
         description = "".join(description_parts)
+        
+        # Set HTML content directly without escaping
         ET.SubElement(item, "description").text = description
         ET.SubElement(item, "content:encoded").text = description
         
@@ -390,11 +391,9 @@ async def cursor_vulnerability_rss_feed(
     
     # Convert to pretty XML
     rough_string = ET.tostring(rss, 'unicode')
-    reparsed = minidom.parseString(rough_string)
-    pretty_xml = reparsed.toprettyxml(indent="  ", encoding=None)
     
-    lines = [line for line in pretty_xml.split('\n') if line.strip()]
-    final_xml = '\n'.join(lines)
+    # Simple pretty printing without reparsing
+    final_xml = rough_string
     
     return Response(
         content=final_xml,
