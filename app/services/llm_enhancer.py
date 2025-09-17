@@ -113,7 +113,8 @@ Guidelines:
 - Keep technical details accessible but thorough
 - Emphasize actionable guidance
 - Use proper markdown formatting for blog readability
-- DO NOT use any emojis in the content
+- ABSOLUTELY NO EMOJIS - Use only text, no symbols, no Unicode characters
+- Strictly professional business writing style only
 
 VULNERABILITY DATA:
 {vuln_context}
