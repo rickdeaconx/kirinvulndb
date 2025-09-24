@@ -51,14 +51,14 @@ railway init
 
 # Set environment variables
 echo -e "${BLUE}Setting environment variables...${NC}"
-railway variables set PORT=8080
-railway variables set DATABASE_URL="sqlite:///./kirinvulndb.db"
-railway variables set NVD_API_KEY="d9b1e4b4-649a-4fac-93e5-fe808def98ec"
-railway variables set API_SECRET_KEY="$(openssl rand -base64 32)"
-railway variables set LOG_LEVEL="INFO"
-railway variables set CVE_COLLECTION_INTERVAL="21600"  # 6 hours
-railway variables set VENDOR_COLLECTION_INTERVAL="43200"  # 12 hours
-railway variables set COMMUNITY_COLLECTION_INTERVAL="86400"  # 24 hours
+railway variables --set "PORT=8080"
+railway variables --set "DATABASE_URL=sqlite:///./kirinvulndb.db"
+railway variables --set "NVD_API_KEY=05c32e35-bd2c-4b72-bfb6-1fb0ac7fe0b4"
+railway variables --set "API_SECRET_KEY=$(openssl rand -base64 32)"
+railway variables --set "LOG_LEVEL=INFO"
+railway variables --set "CVE_COLLECTION_INTERVAL=21600"  # 6 hours
+railway variables --set "VENDOR_COLLECTION_INTERVAL=43200"  # 12 hours
+railway variables --set "COMMUNITY_COLLECTION_INTERVAL=86400"  # 24 hours
 
 # Deploy
 echo -e "${BLUE}Deploying to Railway...${NC}"

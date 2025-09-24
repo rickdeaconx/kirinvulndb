@@ -22,6 +22,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan events for FastAPI application"""
@@ -94,6 +95,17 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error"}
     )
 
+
+# Root health endpoint for Railway
+@app.get("/health")
+async def root_health():
+    """Simple health check for Railway deployment"""
+    return {"status": "healthy", "service": "Kirin VulnDB"}
+
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {"message": "Kirin Vulnerability Database API", "docs": "/docs"}
 
 # Include routers
 app.include_router(health.router, prefix="/api/health", tags=["health"])

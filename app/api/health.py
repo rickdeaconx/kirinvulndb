@@ -18,8 +18,8 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
-        "service": settings.PROJECT_NAME,
-        "version": settings.VERSION
+        "service": "Kirin Vulnerability Database",
+        "version": "1.0.0"
     }
 
 

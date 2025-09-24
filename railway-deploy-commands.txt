@@ -8,7 +8,7 @@ railway init
 
 # Step 3: Set environment variables (NEW SYNTAX) 
 railway variables set DATABASE_URL="sqlite:///./kirinvulndb.db"
-railway variables set NVD_API_KEY="d9b1e4b4-649a-4fac-93e5-fe808def98ec"
+railway variables set NVD_API_KEY="05c32e35-bd2c-4b72-bfb6-1fb0ac7fe0b4"
 railway variables set LOG_LEVEL="INFO" 
 railway variables set CVE_COLLECTION_INTERVAL="21600"
 railway variables set VENDOR_COLLECTION_INTERVAL="43200"
