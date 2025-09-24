@@ -196,8 +196,8 @@ async def vulnerability_rss_feed(
         
         ET.SubElement(item, "title").text = title
         
-        # Link (point to main site since WordPress creates its own post URLs)
-        ET.SubElement(item, "link").text = "https://www.getkirin.com"
+        # Link (FeedWordPress creates URLs using /vulnerability/{vulnerability_id})
+        ET.SubElement(item, "link").text = f"https://www.getkirin.com/vulnerability/{vuln.vulnerability_id}"
         
         # Description (LLM-enhanced blog content for WordPress)
         description = await create_vulnerability_description(vuln)
@@ -326,8 +326,8 @@ async def cursor_vulnerability_rss_feed(
         title = f"Cursor IDE {vuln.severity.value} Vulnerability: {vuln.cve_id or vuln.vulnerability_id}"
         ET.SubElement(item, "title").text = title
         
-        # Link (point to main site since WordPress creates its own post URLs)
-        ET.SubElement(item, "link").text = "https://www.getkirin.com"
+        # Link (FeedWordPress creates URLs using /vulnerability/{vulnerability_id})
+        ET.SubElement(item, "link").text = f"https://www.getkirin.com/vulnerability/{vuln.vulnerability_id}"
         
         # Enhanced description for Cursor
         description_parts = [
