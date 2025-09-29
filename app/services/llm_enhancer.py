@@ -138,7 +138,7 @@ Generate the enhanced blog content:
             # Parse the enhanced content into structured format
             first_line = enhanced_content.split('\n')[0].replace('#', '').strip()
             return {
-                "enhanced_title": f"Kirin Alert: {first_line}",
+                "enhanced_title": f"{first_line}",
                 "enhanced_description": enhanced_content,
                 "blog_format": True,
                 "enhanced_by_llm": True,
@@ -158,7 +158,7 @@ Generate the enhanced blog content:
             tools = [tool.display_name for tool in vuln.affected_tools]
             affected_tools_text = f" affecting {', '.join(tools)}"
         
-        enhanced_title = f"Kirin Alert: {vuln.title}"
+        enhanced_title = f"{vuln.title}"
         
         enhanced_desc = f"""
 ## Executive Summary

@@ -39,11 +39,15 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
             # Return the enhanced blog-style description
             blog_content = enhanced_content["enhanced_description"]
             
-            # Add Kirin footer
+            # Add Kirin footer with proper spacing
             blog_content += f"""
+
 <hr>
+
 <p><em>This vulnerability intelligence is powered by <strong>Kirin</strong> - Advanced AI Security Monitoring</em></p>
+
 <p><em>Confidence Score: {vuln.confidence_score}/1.0 | Source: {vuln.source}</em></p>
+
 <p><em>ID: {vuln.vulnerability_id} | Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>
 """
             return blog_content
@@ -54,28 +58,34 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
     
     # Fallback to original format if LLM fails
     description_parts = [
-        f"<h2>Kirin Security Alert</h2>",
+        f"<h2>Security Vulnerability</h2>",
+        "",  # Add spacing
         f"<p><strong>CVE ID:</strong> {vuln.cve_id or 'N/A'}</p>",
         f"<p><strong>Severity:</strong> {vuln.severity.value} (CVSS: {vuln.cvss_score or 'N/A'})</p>",
         f"<p><strong>Patch Status:</strong> {vuln.patch_status.value}</p>",
+        "",  # Add spacing
         f"<h3>Description</h3>",
         f"<p>{html.escape(vuln.description)}</p>"
     ]
     
     if vuln.attack_vectors:
         vectors = ", ".join(vuln.attack_vectors)
+        description_parts.append("")
         description_parts.append(f"<p><strong>Attack Vectors:</strong> {vectors}</p>")
     
     if vuln.technical_details:
+        description_parts.append("")
         description_parts.append(f"<h3>Technical Details</h3>")
         description_parts.append(f"<p>{html.escape(vuln.technical_details)}</p>")
     
     if vuln.affected_tools:
         tools = [tool.display_name for tool in vuln.affected_tools]
+        description_parts.append("")
         description_parts.append(f"<h3>Affected AI Tools</h3>")
         description_parts.append(f"<p>{', '.join(tools)}</p>")
     
     if vuln.references:
+        description_parts.append("")
         description_parts.append(f"<h3>References</h3>")
         description_parts.append("<ul>")
         for ref in vuln.references:
@@ -187,12 +197,12 @@ async def vulnerability_rss_feed(
         # Enhanced Title using LLM
         try:
             enhanced_content = await llm_enhancer.enhance_vulnerability(vuln)
-            title = enhanced_content.get("enhanced_title", f"Kirin Alert: {vuln.title}")
+            title = enhanced_content.get("enhanced_title", f"{vuln.title}")
         except Exception as e:
             logger.error(f"Failed to enhance title for {vuln.vulnerability_id}: {e}")
             # Fallback title
             tool_names = [tool.display_name for tool in vuln.affected_tools] if vuln.affected_tools else ["AI Tools"]
-            title = f"Kirin Alert: {vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
+            title = f"{vuln.severity.value} Vulnerability in {', '.join(tool_names[:3])}"
         
         ET.SubElement(item, "title").text = title
         
