@@ -56,48 +56,69 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
         logger.error(f"LLM enhancement failed for {vuln.vulnerability_id}: {e}")
         # Fall back to original format
     
-    # Fallback to original format if LLM fails
-    description_parts = [
-        f"<h2>Security Vulnerability</h2>",
-        "",  # Add spacing
-        f"<p><strong>CVE ID:</strong> {vuln.cve_id or 'N/A'}</p>",
-        f"<p><strong>Severity:</strong> {vuln.severity.value} (CVSS: {vuln.cvss_score or 'N/A'})</p>",
-        f"<p><strong>Patch Status:</strong> {vuln.patch_status.value}</p>",
-        "",  # Add spacing
-        f"<h3>Description</h3>",
-        f"<p>{html.escape(vuln.description)}</p>"
-    ]
-    
+    # Fallback to structured WordPress-compatible format
+    overview_section = f"""<h3>Vulnerability Overview</h3>
+<ul>
+<li><strong>CVE ID:</strong> {vuln.cve_id or 'N/A'}</li>
+<li><strong>Severity:</strong> {vuln.severity.value} (CVSS: {vuln.cvss_score or 'N/A'})</li>
+<li><strong>Patch Status:</strong> {vuln.patch_status.value}</li>
+</ul>"""
+
+    description_section = f"""<h3>Description</h3>
+<p>{html.escape(vuln.description)}</p>"""
+
+    attack_vectors_section = ""
     if vuln.attack_vectors:
         vectors = ", ".join(vuln.attack_vectors)
-        description_parts.append("")
-        description_parts.append(f"<p><strong>Attack Vectors:</strong> {vectors}</p>")
-    
+        attack_vectors_section = f"""<h4>Attack Vectors</h4>
+<p><strong>{vectors}</strong></p>"""
+
+    technical_details_section = ""
     if vuln.technical_details:
-        description_parts.append("")
-        description_parts.append(f"<h3>Technical Details</h3>")
-        description_parts.append(f"<p>{html.escape(vuln.technical_details)}</p>")
-    
+        technical_details_section = f"""<h3>Technical Details</h3>
+<p>{html.escape(vuln.technical_details)}</p>"""
+
+    affected_tools_section = ""
     if vuln.affected_tools:
         tools = [tool.display_name for tool in vuln.affected_tools]
-        description_parts.append("")
-        description_parts.append(f"<h3>Affected AI Tools</h3>")
-        description_parts.append(f"<p>{', '.join(tools)}</p>")
-    
+        affected_tools_section = f"""<h3>Affected AI Tools</h3>
+<ul>
+{"".join(f"<li><strong>{tool}</strong></li>" for tool in tools)}
+</ul>"""
+
+    references_section = ""
     if vuln.references:
-        description_parts.append("")
-        description_parts.append(f"<h3>References</h3>")
-        description_parts.append("<ul>")
+        ref_list = []
         for ref in vuln.references:
             ref_text = ref.title if hasattr(ref, 'title') else str(ref)
             ref_url = ref.url if hasattr(ref, 'url') else str(ref)
-            description_parts.append(f"<li><a href='{ref_url}' target='_blank'>{ref_text}</a></li>")
-        description_parts.append("</ul>")
-    
-    description_parts.append(f"<hr>")
-    description_parts.append(f"<p><em>Powered by Knostic Kirin - AI Security Intelligence Platform</em></p>")
-    
-    return "".join(description_parts)
+            ref_list.append(f"<li><a href='{html.escape(ref_url)}' target='_blank'>{html.escape(ref_text)}</a></li>")
+        references_section = f"""<h3>References</h3>
+<ul>
+{"".join(ref_list)}
+</ul>"""
+
+    footer_section = f"""<hr>
+<p><em>This vulnerability intelligence is powered by <strong>Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>Confidence Score: {vuln.confidence_score}/1.0 | Source: {vuln.source}</em></p>
+<p><em>ID: {vuln.vulnerability_id} | Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>"""
+
+    # Combine sections with proper spacing
+    return f"""<p><strong>{vuln.severity.value} SEVERITY</strong> | <strong>CVSS: {vuln.cvss_score or 'N/A'}</strong> | <strong>{vuln.patch_status.value.upper()}</strong></p>
+
+{overview_section}
+
+{description_section}
+
+{attack_vectors_section}
+
+{technical_details_section}
+
+{affected_tools_section}
+
+{references_section}
+
+{footer_section}"""
 
 
 @router.get("/vulnerabilities.xml")
