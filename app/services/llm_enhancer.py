@@ -5,12 +5,64 @@ Transforms raw vulnerability data into blog-style summaries for Kirin
 
 import os
 import logging
+import re
 from typing import Optional
 from openai import AsyncOpenAI
 from app.models.vulnerability import Vulnerability
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def markdown_to_html(markdown_text: str) -> str:
+    """Convert basic markdown formatting to HTML for WordPress compatibility"""
+    if not markdown_text:
+        return ""
+    
+    html_text = markdown_text
+    
+    # Convert headers
+    html_text = re.sub(r'^### (.*?)$', r'<h3>\1</h3>', html_text, flags=re.MULTILINE)
+    html_text = re.sub(r'^## (.*?)$', r'<h2>\1</h2>', html_text, flags=re.MULTILINE)
+    html_text = re.sub(r'^# (.*?)$', r'<h1>\1</h1>', html_text, flags=re.MULTILINE)
+    
+    # Convert bold text
+    html_text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', html_text)
+    
+    # Convert italic text
+    html_text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', html_text)
+    
+    # Convert bullet lists
+    lines = html_text.split('\n')
+    in_list = False
+    converted_lines = []
+    
+    for line in lines:
+        if line.strip().startswith('- '):
+            if not in_list:
+                converted_lines.append('<ul>')
+                in_list = True
+            list_item = line.strip()[2:]  # Remove '- '
+            converted_lines.append(f'<li>{list_item}</li>')
+        else:
+            if in_list:
+                converted_lines.append('</ul>')
+                in_list = False
+            # Convert paragraphs (non-empty lines that aren't headers or lists)
+            if line.strip() and not line.strip().startswith('<'):
+                converted_lines.append(f'<p>{line.strip()}</p>')
+            else:
+                converted_lines.append(line)
+    
+    # Close any open list
+    if in_list:
+        converted_lines.append('</ul>')
+    
+    # Convert horizontal rules
+    html_text = '\n'.join(converted_lines)
+    html_text = re.sub(r'<p>---</p>', r'<hr>', html_text)
+    
+    return html_text
 
 
 class LLMVulnerabilityEnhancer:
@@ -112,14 +164,14 @@ Guidelines:
 - Highlight cybersecurity concerns specific to AI coding assistants
 - Keep technical details accessible but thorough
 - Emphasize actionable guidance
-- Use proper markdown formatting for blog readability
+- Use markdown formatting (##, **, -, etc.) - it will be converted to HTML automatically
 - ABSOLUTELY NO EMOJIS - Use only text, no symbols, no Unicode characters
 - Strictly professional business writing style only
 
 VULNERABILITY DATA:
 {vuln_context}
 
-Generate the enhanced blog content:
+Generate the enhanced blog content in markdown format:
 """
         
         try:
@@ -135,11 +187,14 @@ Generate the enhanced blog content:
             
             enhanced_content = response.choices[0].message.content
             
+            # Convert markdown to HTML for WordPress compatibility
+            html_content = markdown_to_html(enhanced_content)
+            
             # Parse the enhanced content into structured format
             first_line = enhanced_content.split('\n')[0].replace('#', '').strip()
             return {
                 "enhanced_title": f"{first_line}",
-                "enhanced_description": enhanced_content,
+                "enhanced_description": html_content,
                 "blog_format": True,
                 "enhanced_by_llm": True,
                 "enhancement_timestamp": "2024-01-01T00:00:00Z"  # Will be updated with actual timestamp
@@ -160,27 +215,28 @@ Generate the enhanced blog content:
         
         enhanced_title = f"{vuln.title}"
         
-        enhanced_desc = f"""
-## Executive Summary
-{vuln.title}{affected_tools_text} has been identified with {vuln.severity.value.lower()} severity.
+        enhanced_desc = f"""<h2>Executive Summary</h2>
+<p>{vuln.title}{affected_tools_text} has been identified with {vuln.severity.value.lower()} severity.</p>
 
-## Technical Details
-{vuln.description}
+<h2>Technical Details</h2>
+<p>{vuln.description}</p>
 
-## Risk Assessment
-- **Severity**: {vuln.severity.value}
-- **CVSS Score**: {vuln.cvss_score or 'Not assessed'}
-- **Patch Status**: {vuln.patch_status.value}
-- **Confidence Level**: {vuln.confidence_score}/1.0
+<h2>Risk Assessment</h2>
+<ul>
+<li><strong>Severity</strong>: {vuln.severity.value}</li>
+<li><strong>CVSS Score</strong>: {vuln.cvss_score or 'Not assessed'}</li>
+<li><strong>Patch Status</strong>: {vuln.patch_status.value}</li>
+<li><strong>Confidence Level</strong>: {vuln.confidence_score}/1.0</li>
+</ul>
 
-## Affected Tools
-{chr(10).join([f"- {tool.display_name} ({tool.vendor})" for tool in vuln.affected_tools]) if vuln.affected_tools else "No specific tools identified"}
+<h2>Affected Tools</h2>
+{f"<ul>{''.join([f'<li>{tool.display_name} ({tool.vendor})</li>' for tool in vuln.affected_tools])}</ul>" if vuln.affected_tools else "<p>No specific tools identified</p>"}
 
-## Mitigation Guidance
-Monitor for patches and updates from affected vendors. Review your AI coding assistant configurations and consider additional security measures.
+<h2>Mitigation Guidance</h2>
+<p>Monitor for patches and updates from affected vendors. Review your AI coding assistant configurations and consider additional security measures.</p>
 
----
-*This alert was generated by Kirin vulnerability intelligence system.*
+<hr>
+<p><em>This alert was generated by Kirin vulnerability intelligence system.</em></p>
 """
         
         return {
