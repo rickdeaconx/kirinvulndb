@@ -151,27 +151,27 @@ TAGS: {', '.join(vuln.tags) if vuln.tags else 'None'}
         prompt = f"""
 You are a cybersecurity expert writing for the Kirin vulnerability intelligence platform. Transform the following AI coding assistant vulnerability into a professional blog post suitable for developers and security professionals.
 
-Create content with these sections:
-1. **Executive Summary**: 2-3 sentences capturing the key security impact
-2. **Technical Details**: What the vulnerability is and how it works
-3. **Risk Assessment**: Why this matters for developers using AI coding tools
-4. **Mitigation Guidance**: Specific steps developers should take
-5. **Kirin Intelligence**: Brief context on how this fits into the AI security landscape
+Create content with these exact sections:
+1. **Summary**: 2-3 sentences capturing the core vulnerability and immediate impact
+2. **Overview**: Context about what this vulnerability affects and why it matters  
+3. **Details**: Technical explanation of how the vulnerability works and its implications
+4. **Conclusion**: Key takeaways and recommended actions for developers
 
 Guidelines:
 - Write in a professional, informative tone
 - Focus on practical implications for developers
 - Highlight cybersecurity concerns specific to AI coding assistants
 - Keep technical details accessible but thorough
-- Emphasize actionable guidance
+- Emphasize actionable guidance in the conclusion
 - Use markdown formatting (##, **, -, etc.) - it will be converted to HTML automatically
 - ABSOLUTELY NO EMOJIS - Use only text, no symbols, no Unicode characters
 - Strictly professional business writing style only
+- Each section should be substantial (2-4 paragraphs each)
 
 VULNERABILITY DATA:
 {vuln_context}
 
-Generate the enhanced blog content in markdown format:
+Generate the enhanced blog content in markdown format with Summary, Overview, Details, and Conclusion sections:
 """
         
         try:
@@ -215,28 +215,30 @@ Generate the enhanced blog content in markdown format:
         
         enhanced_title = f"{vuln.title}"
         
-        enhanced_desc = f"""<h2>Executive Summary</h2>
-<p>{vuln.title}{affected_tools_text} has been identified with {vuln.severity.value.lower()} severity.</p>
+        enhanced_desc = f"""<h2>Summary</h2>
+<p>A {vuln.severity.value.lower()} severity vulnerability has been identified{affected_tools_text}. This security issue poses potential risks to developers and organizations using affected AI coding assistants in their development workflows.</p>
 
-<h2>Technical Details</h2>
+<h2>Overview</h2>
+<p>This vulnerability affects AI-powered development tools that assist with code generation and development tasks. The issue has been classified with a CVSS score of {vuln.cvss_score or 'pending assessment'} and is currently in {vuln.patch_status.value.replace('_', ' ').lower()} status.</p>
+<p>AI coding assistants have become integral to modern software development, making security vulnerabilities in these tools particularly concerning for development teams and organizations.</p>
+
+<h2>Details</h2>
 <p>{vuln.description}</p>
-
-<h2>Risk Assessment</h2>
+<p>The vulnerability presents the following risk characteristics:</p>
 <ul>
-<li><strong>Severity</strong>: {vuln.severity.value}</li>
-<li><strong>CVSS Score</strong>: {vuln.cvss_score or 'Not assessed'}</li>
-<li><strong>Patch Status</strong>: {vuln.patch_status.value}</li>
-<li><strong>Confidence Level</strong>: {vuln.confidence_score}/1.0</li>
+<li><strong>Severity Level</strong>: {vuln.severity.value}</li>
+<li><strong>CVSS Score</strong>: {vuln.cvss_score or 'Under assessment'}</li>
+<li><strong>Current Status</strong>: {vuln.patch_status.value.replace('_', ' ').title()}</li>
+<li><strong>Detection Confidence</strong>: {vuln.confidence_score * 100:.0f}%</li>
 </ul>
+{f"<p><strong>Affected Tools:</strong></p><ul>{''.join([f'<li>{tool.display_name} ({tool.vendor})</li>' for tool in vuln.affected_tools])}</ul>" if vuln.affected_tools else "<p>Specific tool impacts are under investigation.</p>"}
 
-<h2>Affected Tools</h2>
-{f"<ul>{''.join([f'<li>{tool.display_name} ({tool.vendor})</li>' for tool in vuln.affected_tools])}</ul>" if vuln.affected_tools else "<p>No specific tools identified</p>"}
-
-<h2>Mitigation Guidance</h2>
-<p>Monitor for patches and updates from affected vendors. Review your AI coding assistant configurations and consider additional security measures.</p>
+<h2>Conclusion</h2>
+<p>Development teams using AI coding assistants should monitor this vulnerability closely and implement appropriate security measures. Organizations should review their AI tool usage policies and ensure proper security controls are in place.</p>
+<p>Key recommendations include monitoring for patches and updates from affected vendors, reviewing AI coding assistant configurations, and considering additional security measures for development environments. Stay informed about updates to this vulnerability through official security channels.</p>
 
 <hr>
-<p><em>This alert was generated by Kirin vulnerability intelligence system.</em></p>
+<p><em>This vulnerability analysis was generated by the Kirin intelligence system.</em></p>
 """
         
         return {
