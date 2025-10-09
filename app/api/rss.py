@@ -44,7 +44,7 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
 
 <hr>
 
-<p><em>This vulnerability intelligence is powered by <strong>Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>This vulnerability intelligence is powered by <strong><a href="https://getkirin.com" target="_blank">Kirin</a></strong> - Advanced AI Security Monitoring</em></p>
 
 <p><em>Confidence Score: {vuln.confidence_score}/1.0 | Source: {vuln.source}</em></p>
 
@@ -99,7 +99,7 @@ async def create_vulnerability_description(vuln: Vulnerability) -> str:
 </ul>"""
 
     footer_section = f"""<hr>
-<p><em>This vulnerability intelligence is powered by <strong>Kirin</strong> - Advanced AI Security Monitoring</em></p>
+<p><em>This vulnerability intelligence is powered by <strong><a href="https://getkirin.com" target="_blank">Kirin</a></strong> - Advanced AI Security Monitoring</em></p>
 <p><em>Confidence Score: {vuln.confidence_score}/1.0 | Source: {vuln.source}</em></p>
 <p><em>ID: {vuln.vulnerability_id} | Discovered: {vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else 'Unknown'}</em></p>"""
 

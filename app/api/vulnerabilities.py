@@ -21,6 +21,85 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+@router.get("/hub")
+async def vulnerabilities_hub(
+    db: Session = Depends(get_db)
+):
+    """
+    Vulnerabilities hub page with introduction and glossary
+    """
+    # Get vulnerability statistics for the intro
+    total_vulnerabilities = db.query(Vulnerability).count()
+    critical_count = db.query(Vulnerability).filter(Vulnerability.severity == SeverityEnum.CRITICAL).count()
+    high_count = db.query(Vulnerability).filter(Vulnerability.severity == SeverityEnum.HIGH).count()
+    
+    # Get recent vulnerabilities (last 7 days)
+    week_ago = datetime.utcnow() - timedelta(days=7)
+    recent_count = db.query(Vulnerability).filter(Vulnerability.created_at >= week_ago).count()
+    
+    # Create vulnerability glossary (alphabetically organized)
+    vulnerabilities = db.query(Vulnerability).order_by(Vulnerability.title).all()
+    
+    # Group vulnerabilities by first letter
+    glossary = {}
+    vulnerability_types = set()
+    
+    for vuln in vulnerabilities:
+        first_letter = vuln.title[0].upper()
+        if first_letter not in glossary:
+            glossary[first_letter] = []
+        
+        # Identify vulnerability type for better organization
+        vuln_type = "Security Vulnerability"
+        title_lower = vuln.title.lower()
+        if "injection" in title_lower:
+            vuln_type = "Injection Attack"
+        elif "jailbreak" in title_lower:
+            vuln_type = "Jailbreaking Technique"
+        elif "bypass" in title_lower:
+            vuln_type = "Security Bypass"
+        elif "execution" in title_lower:
+            vuln_type = "Code Execution"
+        elif "prompt" in title_lower:
+            vuln_type = "Prompt Manipulation"
+        
+        vulnerability_types.add(vuln_type)
+        
+        glossary[first_letter].append({
+            "id": vuln.vulnerability_id,
+            "title": vuln.title,
+            "type": vuln_type,
+            "severity": vuln.severity.value,
+            "cvss_score": vuln.cvss_score,
+            "description": vuln.description[:200] + "..." if len(vuln.description) > 200 else vuln.description,
+            "affected_tools": [tool.display_name for tool in vuln.affected_tools],
+            "discovery_date": vuln.discovery_date.strftime('%Y-%m-%d') if vuln.discovery_date else None
+        })
+    
+    return {
+        "page_title": "AI Security Vulnerabilities Hub",
+        "meta_description": "Comprehensive database of AI coding assistant vulnerabilities. Track security threats, jailbreaks, and exploits affecting AI development tools.",
+        "introduction": {
+            "title": "Welcome to the Kirin AI Security Vulnerabilities Hub",
+            "description": """This comprehensive database tracks security vulnerabilities affecting AI coding assistants and development tools. 
+            Our intelligence platform monitors threats, analyzes attack patterns, and provides actionable security guidance for developers and organizations.
+            
+            Browse our alphabetically organized vulnerability glossary to understand specific threats, or use our search and filtering tools to find vulnerabilities 
+            affecting your development stack.""",
+            "statistics": {
+                "total_vulnerabilities": total_vulnerabilities,
+                "critical_vulnerabilities": critical_count,
+                "high_vulnerabilities": high_count,
+                "recent_vulnerabilities": recent_count,
+                "vulnerability_types": len(vulnerability_types)
+            }
+        },
+        "glossary": dict(sorted(glossary.items())),
+        "vulnerability_types": sorted(list(vulnerability_types)),
+        "last_updated": datetime.utcnow().isoformat()
+    }
+
+
 @router.get("/latest", response_model=VulnerabilityList)
 async def get_latest_vulnerabilities(
     hours: int = Query(24, description="Hours to look back", ge=1, le=168),

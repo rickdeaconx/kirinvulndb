@@ -16,6 +16,7 @@ from app.models.vulnerability import Vulnerability, SeverityEnum, PatchStatusEnu
 from app.models.tool import AITool
 from app.services.ai_vulnerability_analyzer import AIVulnerabilityAnalyzer, VulnerabilityAnalysis
 from app.services.websocket_manager import websocket_manager
+from app.services.llm_enhancer import llm_enhancer, create_slug
 from app.schemas.vulnerability import VulnerabilityResponse
 from pydantic import BaseModel, Field
 
@@ -438,16 +439,24 @@ async def create_wordpress_blog_post(
 
 {footer_section}"""
         
+        # Get enhanced content for metadata
+        enhanced_content = await llm_enhancer.enhance_vulnerability(vulnerability)
+        
+        # Use enhanced title if available
+        final_title = enhanced_content.get("enhanced_title", post_title)
+        
         # Create WordPress post data structure
         wordpress_post = {
             "post_id": f"kirin-{vulnerability.vulnerability_id.lower()}",
-            "title": post_title,
+            "title": final_title,
             "content": post_content,
+            "slug": enhanced_content.get("slug", create_slug(final_title)),
+            "meta_description": enhanced_content.get("meta_description", f"{final_title} - AI security vulnerability analysis"),
             "categories": ["Security", "Vulnerability", "AI Tools", analysis.severity],
             "tags": analysis.affected_tools + analysis.attack_vectors + [analysis.patch_status],
             "status": "draft",  # Start as draft for review
             "author": "Kirin VulnDB",
-            "excerpt": f"{analysis.enhanced_description[:150]}...",
+            "excerpt": enhanced_content.get("meta_description", f"{final_title}..."),
             "custom_fields": {
                 "vulnerability_id": vulnerability.vulnerability_id,
                 "cve_id": vulnerability.cve_id,
